@@ -1,7 +1,6 @@
 package com.savo.backend.model;
 
 import com.savo.backend.enums.PatternType;
-import com.savo.backend.enums.TransactionType;
 import com.savo.backend.enums.TrendDirection;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
