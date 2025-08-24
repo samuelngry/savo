@@ -2,6 +2,7 @@ package com.savo.backend.model;
 
 import com.savo.backend.enums.UploadStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,12 +23,14 @@ public class StatementUpload {
     @JoinColumn(name = "bank_account_id", nullable = false)
     private BankAccount bankAccount;
 
+    @NotBlank(message = "File name is required")
     @Column(name = "file_name", nullable = false)
     private String fileName;
 
     @Column(name = "file_size", nullable = false)
     private Long fileSize;
 
+    @NotBlank(message = "S3 key is required")
     @Column(name = "s3_key", nullable = false)
     private String s3Key;
 
