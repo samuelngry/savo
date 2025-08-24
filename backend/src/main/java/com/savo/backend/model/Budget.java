@@ -37,7 +37,7 @@ public class Budget {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "period", nullable = false)
-    private BudgetPeriod budgetPeriod;
+    private BudgetPeriod period;
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
@@ -64,6 +64,29 @@ public class Budget {
     private List<BudgetProgress> budgetProgress = new ArrayList<>();
 
     public Budget() {}
+
+    // Constructor with essential fields
+    public Budget(User user, Category category, BigDecimal amount, BudgetPeriod period, LocalDate startDate) {
+        this.user = user;
+        this.category = category;
+        this.amount = amount;
+        this.period = period;
+        this.startDate = startDate;
+    }
+
+    public double getAlertThresholdDecimal() {
+        return alertThreshold / 100.0; // Convert 80 to 0.8
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     public String getId() {
         return id;
@@ -97,12 +120,12 @@ public class Budget {
         this.category = category;
     }
 
-    public BudgetPeriod getBudgetPeriod() {
-        return budgetPeriod;
+    public BudgetPeriod getPeriod() {
+        return period;
     }
 
-    public void setBudgetPeriod(BudgetPeriod budgetPeriod) {
-        this.budgetPeriod = budgetPeriod;
+    public void setPeriod(BudgetPeriod period) {
+        this.period = period;
     }
 
     public LocalDate getStartDate() {
