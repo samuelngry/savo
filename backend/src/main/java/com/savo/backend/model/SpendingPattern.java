@@ -32,7 +32,7 @@ public class SpendingPattern {
     // Pattern Strength
 
     @Column(name = "confidence_score", precision = 4, scale = 2)
-    private Double confidenceScore;
+    private BigDecimal confidenceScore;
 
     @Column(name = "frequency_count")
     private Integer frequencyCount;
@@ -63,7 +63,7 @@ public class SpendingPattern {
     private BigDecimal potentialSavings;
 
     @Column(name = "priority_score", precision = 4, scale = 2)
-    private Double priorityScore;
+    private BigDecimal priorityScore;
 
     @Column(name = "first_detected", nullable = false)
     private LocalDateTime firstDetected;
@@ -118,12 +118,16 @@ public class SpendingPattern {
         this.patternName = patternName;
     }
 
-    public Double getConfidenceScore() {
+    public BigDecimal getConfidenceScore() {
         return confidenceScore;
     }
 
-    public void setConfidenceScore(Double confidenceScore) {
+    public void setConfidenceScore(BigDecimal confidenceScore) {
         this.confidenceScore = confidenceScore;
+    }
+
+    public void setPriorityScore(BigDecimal priorityScore) {
+        this.priorityScore = priorityScore;
     }
 
     public BigDecimal getAverageAmount() {
@@ -188,14 +192,6 @@ public class SpendingPattern {
 
     public void setFirstDetected(LocalDateTime firstDetected) {
         this.firstDetected = firstDetected;
-    }
-
-    public Double getPriorityScore() {
-        return priorityScore;
-    }
-
-    public void setPriorityScore(Double priorityScore) {
-        this.priorityScore = priorityScore;
     }
 
     public LocalDateTime getLastUpdated() {
