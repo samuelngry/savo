@@ -1,0 +1,19 @@
+package com.savo.backend.repository;
+
+import com.savo.backend.model.BankAccount;
+import com.savo.backend.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface BankAccountRepository extends JpaRepository<BankAccount, String> {
+
+    List<BankAccount> findByUserAndIsActiveTrue(User user);
+
+    List<BankAccount> findByUser(User user);
+
+    Optional<BankAccount> findByUserAndAccountNumberMasked(User user, String accountNumberMasked);
+
+    boolean existsByUserAndAccountNickname(String userId, String accountNickname);
+}
