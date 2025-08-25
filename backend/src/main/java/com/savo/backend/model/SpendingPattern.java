@@ -206,6 +206,10 @@ public class SpendingPattern {
         return isActive;
     }
 
+    public BigDecimal getPriorityScore() {
+        return priorityScore;
+    }
+
     public void setActive(boolean active) {
         isActive = active;
     }
