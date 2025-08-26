@@ -55,4 +55,45 @@ public class UserController {
                     .body(Map.of("error", "Google login failed: " + e.getMessage()));
         }
     }
+
+    // Traditional Auth Endpoints
+
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            String username = request.get("username"); // optional
+            String password = request.get("password");
+            String firstName = request.get("firstName");
+            String lastName = request.get("lastName");
+
+            if (email == null || password == null || firstName == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Email, password, and firstName are required"));
+            }
+
+            if (userService.isEmailTaken(email)) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Email already exists"));
+            }
+
+            User user = userService.createLocalUser(email, username, password, firstName, lastName);
+
+            Map<String, Object> response = Map.of(
+                    "id", user.getId(),
+                    "email", user.getEmail(),
+                    "username", user.getUsername() != null ? user.getUsername() : "",
+                    "firstName", user.getFirstName(),
+                    "lastName", user.getLastName(),
+                    "provider", user.getProvider(),
+                    "emailVerified", user.getEmailVerified(),
+                    "message", "User registered successfully. Please verify your email."
+            );
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
 }
