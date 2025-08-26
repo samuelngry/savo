@@ -141,4 +141,26 @@ public class UserService {
         }
         return user.getFirstName();
     }
+
+    public User updateUserProfile(String id, String firstName, String lastName,
+                                  String timezone, String currency) {
+        User user = findById(id)
+                .orElseThrow(() -> new RuntimeException("User with id " + id + " not found"));
+
+        if (firstName != null && !firstName.trim().isEmpty()) {
+            user.setFirstName(firstName);
+        }
+        if (lastName != null) {
+            user.setLastName(lastName);
+        }
+        if (timezone != null) {
+            user.setTimezone(timezone);
+        }
+        if (currency != null) {
+            user.setCurrency(currency);
+        }
+
+        user.setUpdatedAt(LocalDateTime.now());
+        return userRepository.save(user);
+    }
 }
