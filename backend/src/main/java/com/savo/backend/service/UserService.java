@@ -134,4 +134,11 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    public String getUserFullName(User user) {
+        if (user.getLastName() != null && !user.getLastName().trim().isEmpty()) {
+            return user.getFirstName() + " " + user.getLastName();
+        }
+        return user.getFirstName();
+    }
 }
