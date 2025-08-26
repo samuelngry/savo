@@ -192,4 +192,33 @@ public class UserService {
         user.setUpdatedAt(LocalDateTime.now());
         return userRepository.save(user);
     }
+
+    // Helper methods
+
+    public boolean isEmailTaken(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public boolean isUsernameTaken(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public boolean isOAuthUser(String id) {
+        return findById(id)
+                .map(user -> !"local".equals(user.getProvider()))
+                .orElse(false);
+    }
+
+    public long getTotalUserCount() {
+        return userRepository.count();
+    }
+
+    // For development/testing
+    public User createSampleUser(String email, String firstName, String lastName) {
+        if (userRepository.existsByEmail(email)) {
+            return userRepository.findByEmail(email).get();
+        }
+
+        return createLocalUser(email, null, "password123", firstName, lastName);
+    }
 }
