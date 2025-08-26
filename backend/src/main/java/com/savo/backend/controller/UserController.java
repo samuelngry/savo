@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -85,7 +86,6 @@ public class UserController {
                     "username", user.getUsername() != null ? user.getUsername() : "",
                     "firstName", user.getFirstName(),
                     "lastName", user.getLastName(),
-                    "provider", user.getProvider(),
                     "emailVerified", user.getEmailVerified(),
                     "message", "User registered successfully. Please verify your email."
             );
@@ -94,6 +94,47 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+        try {
+            String emailOrUsername = request.get("emailOrUsername");
+            String password = request.get("password");
+
+            if (emailOrUsername == null || password == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Email/username and password are required"));
+            }
+
+            Optional<User> userOptional = userService.authenticateLocalUser(emailOrUsername, password);
+
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+
+                Map<String, Object> response = Map.of(
+                        "id", user.getId(),
+                        "email", user.getEmail(),
+                        "firstName", user.getFirstName(),
+                        "fullName", userService.getUserFullName(user),
+                        "username", user.getUsername() != null ? user.getUsername() : "",
+                        "provider", user.getProvider(),
+                        "emailVerified", user.getEmailVerified(),
+                        "currency", user.getCurrency(),
+                        "timezone", user.getTimezone(),
+                        "message", "Login successful"
+                );
+
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Invalid username or password"));
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Login failed: " + e.getMessage()));
         }
     }
 }
