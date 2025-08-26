@@ -163,4 +163,24 @@ public class UserService {
         user.setUpdatedAt(LocalDateTime.now());
         return userRepository.save(user);
     }
+
+    public boolean changePassword(String id, String currentPassword, String newPassword) {
+        User user =  findById(id)
+                .orElseThrow(() -> new RuntimeException("User with id " + id + " not found"));
+
+        // Only local users can change password
+        if (!"local".equals(user.getProvider()) || user.getPasswordHash() == null) {
+            throw new RuntimeException("Cannot change password");
+        }
+
+        // Verify current password
+        if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
+            return false;
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return true;
+    }
 }
