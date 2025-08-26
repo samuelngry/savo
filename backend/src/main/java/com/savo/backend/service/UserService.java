@@ -64,4 +64,59 @@ public class UserService {
     public User handleGoogleLogin(String email, String firstName, String lastName, String googleId) {
         return findOrCreateOAuthUser(email, firstName, lastName, "google", googleId);
     }
+
+    // Traditional Login Method
+
+    public User createLocalUser(String email, String username, String password,
+                                String firstName, String lastName) {
+
+        // Check if user already exists
+        if (userRepository.existsByEmail(email)) {
+            throw new RuntimeException("User with email " + email + " already exists");
+        }
+
+        if (username != null && userRepository.existsByUsername(username)) {
+            throw new RuntimeException("Username " + username + " is already taken");
+        }
+
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setUsername(username);
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setProvider("local");
+        user.setEmailVerified(false);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+
+        return userRepository.save(user);
+    }
+
+    // Authenticate local user
+
+    public Optional<User> authenticateLocalUser(String emailOrUsername, String password) {
+        // Try to find by email first, then username
+        Optional<User> userOptional = userRepository.findByEmail(emailOrUsername);
+        if (userOptional.isEmpty()) {
+            userOptional = userRepository.findByUsername(emailOrUsername);
+        }
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            // Only authenticate local users
+            if ("local".equals(user.getProvider()) &&
+                user.getPasswordHash() != null &&
+                passwordEncoder.matches(password, user.getPasswordHash())) {
+
+                user.setUpdatedAt(LocalDateTime.now());
+                userRepository.save(user);
+                return Optional.of(user);
+            }
+        }
+
+        return Optional.empty();
+    }
 }
