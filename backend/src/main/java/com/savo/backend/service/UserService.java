@@ -183,4 +183,13 @@ public class UserService {
         userRepository.save(user);
         return true;
     }
+
+    public User verifyEmail(String id) {
+        User user = findById(id)
+                .orElseThrow(() -> new RuntimeException("User with id " + id + " not found"));
+
+        user.setEmailVerified(true);
+        user.setUpdatedAt(LocalDateTime.now());
+        return userRepository.save(user);
+    }
 }
