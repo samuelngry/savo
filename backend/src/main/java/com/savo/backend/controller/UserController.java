@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,18 +38,17 @@ public class UserController {
 
             User user = userService.handleGoogleLogin(email, firstName, lastName, googleId);
 
-            Map<String, Object> response = Map.of(
-                    "id", user.getId(),
-                    "email", user.getEmail(),
-                    "firstName", user.getFirstName(),
-                    "lastName", user.getLastName() != null ? user.getLastName() : "",
-                    "fullName", userService.getUserFullName(user),
-                    "provider", user.getProvider(),
-                    "emailVerified", user.getEmailVerified(),
-                    "currency", user.getCurrency(),
-                    "timezone", user.getTimezone(),
-                    "message", "Google login successful"
-            );
+            Map<String, Object> response = new HashMap<>();
+                response.put("id", user.getId());
+                response.put("email", user.getEmail());
+                response.put("firstName", user.getFirstName());
+                response.put("lastName", user.getLastName() != null ? user.getLastName() : "");
+                response.put("fullName", userService.getUserFullName(user));
+                response.put("provider", user.getProvider());
+                response.put("emailVerified", user.getEmailVerified());
+                response.put("currency", user.getCurrency());
+                response.put("timezone", user.getTimezone());
+                response.put("message", "Google login successful");
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -113,18 +113,18 @@ public class UserController {
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
 
-                Map<String, Object> response = Map.of(
-                        "id", user.getId(),
-                        "email", user.getEmail(),
-                        "firstName", user.getFirstName(),
-                        "fullName", userService.getUserFullName(user),
-                        "username", user.getUsername() != null ? user.getUsername() : "",
-                        "provider", user.getProvider(),
-                        "emailVerified", user.getEmailVerified(),
-                        "currency", user.getCurrency(),
-                        "timezone", user.getTimezone(),
-                        "message", "Login successful"
-                );
+                Map<String, Object> response = new HashMap<>();
+                response.put("id", user.getId());
+                response.put("email", user.getEmail());
+                response.put("firstName", user.getFirstName());
+                response.put("lastName", user.getLastName() != null ? user.getLastName() : "");
+                response.put("fullName", userService.getUserFullName(user));
+                response.put("username", user.getUsername() != null ? user.getUsername() : "");
+                response.put("provider", user.getProvider());
+                response.put("emailVerified", user.getEmailVerified());
+                response.put("currency", user.getCurrency());
+                response.put("timezone", user.getTimezone());
+                response.put("message", "Login successful");
 
                 return ResponseEntity.ok(response);
             } else {
@@ -137,4 +137,39 @@ public class UserController {
                     .body(Map.of("error", "Login failed: " + e.getMessage()));
         }
     }
+
+    // User Profile Endpoints
+
+    @GetMapping("/{id}/profile")
+    public ResponseEntity<?> getUserProfile(@PathVariable String id) {
+        try {
+            Optional<User> userOptional = userService.findById(id);
+
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+
+                Map<String, Object> profile = new HashMap<>();
+                profile.put("id", user.getId());
+                profile.put("email", user.getEmail());
+                profile.put("firstName", user.getFirstName());
+                profile.put("lastName", user.getLastName() != null ? user.getLastName() : "");
+                profile.put("fullName", userService.getUserFullName(user));
+                profile.put("username", user.getUsername() != null ? user.getUsername() : "");
+                profile.put("provider", user.getProvider());
+                profile.put("emailVerified", user.getEmailVerified());
+                profile.put("currency", user.getCurrency());
+                profile.put("timezone", user.getTimezone());
+                profile.put("createdAt", user.getCreatedAt());
+                profile.put("isOAuthUser", userService.isOAuthUser(user.getId()));
+
+                return ResponseEntity.ok(profile);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+
+        }  catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }
