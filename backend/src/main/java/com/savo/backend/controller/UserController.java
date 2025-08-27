@@ -172,4 +172,32 @@ public class UserController {
         }
     }
 
+    @PutMapping("{id}/profile")
+    public ResponseEntity<?> updateUserProfile(@PathVariable String id, @RequestBody Map<String, String> request) {
+        try {
+            String firstName = request.get("firstName");
+            String lastName = request.get("lastName");
+            String currency = request.get("currency");
+            String timezone = request.get("timezone");
+
+            User updatedUser = userService.updateUserProfile(id, firstName, lastName, timezone, currency);
+
+            Map<String, Object> response = Map.of(
+                    "id", updatedUser.getId(),
+                    "email", updatedUser.getEmail(),
+                    "firstName", updatedUser.getFirstName(),
+                    "lastName", updatedUser.getLastName(),
+                    "fullName", userService.getUserFullName(updatedUser),
+                    "currency", updatedUser.getCurrency(),
+                    "timezone", updatedUser.getTimezone(),
+                    "message", "Profile updated successfully"
+            );
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to update user profile"));
+        }
+    }
 }
