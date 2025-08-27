@@ -195,6 +195,9 @@ public class UserController {
 
             return ResponseEntity.ok(response);
 
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to update user profile"));
@@ -221,9 +224,26 @@ public class UserController {
                         .body(Map.of("error", "Password changed failed"));
             }
 
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to change password"));
+        }
+    }
+
+    @PostMapping("{id}/verify-email")
+    public ResponseEntity<?> verifyEmail(@PathVariable String id, @RequestBody Map<String, String> request) {
+        try {
+            User user = userService.verifyEmail(id);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Email verified successfully",
+                    "emailVerified", user.getEmailVerified()
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 }
