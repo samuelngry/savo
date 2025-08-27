@@ -200,4 +200,30 @@ public class UserController {
                     .body(Map.of("error", "Failed to update user profile"));
         }
     }
+
+    @PostMapping("{id}/change-password")
+    public ResponseEntity<?> changePassword(@PathVariable String id, @RequestBody Map<String, String> request) {
+        try {
+            String currentPassword = request.get("currentPassword");
+            String newPassword = request.get("newPassword");
+
+            if (currentPassword == null || newPassword == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Current password and new password are required"));
+            }
+
+            boolean success = userService.changePassword(id, currentPassword, newPassword);
+
+            if (success) {
+                return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
+            } else {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Password changed failed"));
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to change password"));
+        }
+    }
 }
