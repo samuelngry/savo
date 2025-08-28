@@ -3,7 +3,6 @@ package com.savo.backend.service;
 import com.savo.backend.model.BankAccount;
 import com.savo.backend.model.User;
 import com.savo.backend.repository.BankAccountRepository;
-import com.savo.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -42,5 +41,9 @@ public class BankAccountService {
         newAccount.setCreatedAt(LocalDateTime.now());
 
         return bankAccountRepository.save(newAccount);
+    }
+
+    public boolean isNickNameTaken(User user, String accountNickname) {
+        return bankAccountRepository.existsByUserAndAccountNickname(user, accountNickname);
     }
 }
