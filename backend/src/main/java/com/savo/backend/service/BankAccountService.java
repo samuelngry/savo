@@ -2,9 +2,11 @@ package com.savo.backend.service;
 
 import com.savo.backend.dto.BankAccountCreateDTO;
 import com.savo.backend.dto.BankAccountResponseDTO;
+import com.savo.backend.dto.BankAccountUpdateDTO;
 import com.savo.backend.model.BankAccount;
 import com.savo.backend.model.User;
 import com.savo.backend.repository.BankAccountRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -48,48 +50,27 @@ public class BankAccountService {
                 .collect(Collectors.toList());
     }
 
+    public BankAccountResponseDTO updateBankAccount(String userId, String accountId, BankAccountUpdateDTO updateDTO) {
+        BankAccount existingAccount = bankAccountRepository.findByUserIdAndId(userId, accountId)
+                .orElseThrow(() -> new EntityNotFoundException("Bank account not found or access denied"));
+
+        if (updateDTO.getAccountNickname() != null) {
+            existingAccount.setAccountNickname(updateDTO.getAccountNickname());
+        }
+
+        if (updateDTO.getActive() != null) {
+            existingAccount.setActive(updateDTO.getActive());
+        }
+
+        existingAccount.setUpdatedAt(LocalDateTime.now());
+
+        BankAccount updated = bankAccountRepository.save(existingAccount);
+        return BankAccountResponseDTO.from(updated);
+    }
+
     private String maskAccountNumber(String fullNumber) {
         if (fullNumber.length() <= 4) return fullNumber;
         return "****" + fullNumber.substring(fullNumber.length() - 4);
     }
 
-    public List<BankAccount> getAllActiveAccounts(User user) {
-        return bankAccountRepository.findByUserAndIsActiveTrue(user);
-    }
-
-    public BankAccount findOrCreateBankAccount(User user, String bankName, String bankNumberMasked, String accountType) {
-        Optional<BankAccount> existing = bankAccountRepository
-                .findByUserIdAndBankNameAndAccountNumberMasked(user.getId(), bankName, bankNumberMasked);
-
-        if (existing.isPresent()) {
-            return existing.get();
-        }
-
-        BankAccount newAccount = new BankAccount();
-        newAccount.setUser(user);
-        newAccount.setBankName(bankName);
-        newAccount.setAccountNumberMasked(bankNumberMasked);
-        newAccount.setAccountType(accountType);
-        newAccount.setActive(true);
-        newAccount.setCreatedAt(LocalDateTime.now());
-
-        return bankAccountRepository.save(newAccount);
-    }
-
-    public BankAccount updateNickname(User user, String accountId, String newNickname) {
-
-        BankAccount account = bankAccountRepository.findById(accountId)
-                .orElseThrow(() -> new RuntimeException("Bank account not found"));
-
-        if (!account.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized to update this bank account");
-        }
-
-        if (bankAccountRepository.existsByUserAndAccountNickname(user, newNickname)) {
-            throw new RuntimeException("Nickname already exists");
-        }
-
-        account.setAccountNickname(newNickname);
-        return bankAccountRepository.save(account);
-    }
 }
