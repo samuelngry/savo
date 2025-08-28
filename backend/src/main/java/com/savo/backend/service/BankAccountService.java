@@ -43,7 +43,20 @@ public class BankAccountService {
         return bankAccountRepository.save(newAccount);
     }
 
-    public boolean isNickNameTaken(User user, String accountNickname) {
-        return bankAccountRepository.existsByUserAndAccountNickname(user, accountNickname);
+    public BankAccount updateNickname(User user, String accountId, String newNickname) {
+
+        BankAccount account = bankAccountRepository.findById(accountId)
+                .orElseThrow(() -> new RuntimeException("Bank account not found"));
+
+        if (!account.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized to update this bank account");
+        }
+
+        if (bankAccountRepository.existsByUserAndAccountNickname(user, newNickname)) {
+            throw new RuntimeException("Nickname already exists");
+        }
+
+        account.setAccountNickname(newNickname);
+        return bankAccountRepository.save(account);
     }
 }
