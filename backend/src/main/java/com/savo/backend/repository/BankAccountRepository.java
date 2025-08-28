@@ -13,7 +13,7 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, String
 
     List<BankAccount> findByUser(User user);
 
-    Optional<BankAccount> findByUserAndAccountNumberMasked(User user, String accountNumberMasked);
+    Optional<BankAccount> findByUserIdAndBankNameAndAccountNumberMasked(String id, String bankName, String accountNumberMasked);
 
-    boolean existsByUserAndAccountNickname(String userId, String accountNickname);
+    boolean existsByUserAndAccountNickname(User user, String accountNickname);
 }
