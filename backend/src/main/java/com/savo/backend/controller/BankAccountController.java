@@ -39,6 +39,7 @@ public class BankAccountController {
             }
 
             bankAccountService.updateNickname(user, id, newNickname);
+
             return ResponseEntity.ok(Map.of("message", "Successfully updated nickname"));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
