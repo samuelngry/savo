@@ -1,9 +1,10 @@
 package com.savo.backend.service;
 
+import com.savo.backend.dto.BankAccountCreateDTO;
+import com.savo.backend.dto.BankAccountResponseDTO;
 import com.savo.backend.model.BankAccount;
 import com.savo.backend.model.User;
 import com.savo.backend.repository.BankAccountRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -11,13 +12,36 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class BankAccountService {
 
     private final BankAccountRepository bankAccountRepository;
 
     public BankAccountService(BankAccountRepository bankAccountRepository) {
         this.bankAccountRepository = bankAccountRepository;
+    }
+
+    public BankAccountResponseDTO createBankAccount(String userId, BankAccountCreateDTO createDTO) {
+        // Convert DTO to entity
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.setUserId(userId);
+        bankAccount.setBankName(createDTO.getBankName());
+        bankAccount.setAccountType(createDTO.getAccountType());
+
+        String maskedNumber = maskAccountNumber(createDTO.getAccountNumber());
+        bankAccount.setAccountNumberMasked(maskedNumber);
+
+        bankAccount.setAccountNickname(createDTO.getAccountNickname());
+        bankAccount.setActive(true);
+        bankAccount.setCreatedAt(LocalDateTime.now());
+
+        BankAccount saved = bankAccountRepository.save(bankAccount);
+
+        return BankAccountResponseDTO.from(saved);
+    }
+
+    private String maskAccountNumber(String fullNumber) {
+        if (fullNumber.length() <= 4) return fullNumber;
+        return "****" + fullNumber.substring(fullNumber.length() - 4);
     }
 
     public List<BankAccount> getAllActiveAccounts(User user) {
