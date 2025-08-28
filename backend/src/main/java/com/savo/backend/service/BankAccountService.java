@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BankAccountService {
@@ -37,6 +38,14 @@ public class BankAccountService {
         BankAccount saved = bankAccountRepository.save(bankAccount);
 
         return BankAccountResponseDTO.from(saved);
+    }
+
+    public List<BankAccountResponseDTO> getUserBankAccounts(String userId) {
+        List<BankAccount> bankAccounts = bankAccountRepository.findByUserIdAndIsActiveTrue(userId);
+
+        return bankAccounts.stream()
+                .map(BankAccountResponseDTO::from)
+                .collect(Collectors.toList());
     }
 
     private String maskAccountNumber(String fullNumber) {
