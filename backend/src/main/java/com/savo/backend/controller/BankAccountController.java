@@ -3,7 +3,6 @@ package com.savo.backend.controller;
 import com.savo.backend.dto.BankAccountCreateDTO;
 import com.savo.backend.dto.BankAccountResponseDTO;
 import com.savo.backend.dto.BankAccountUpdateDTO;
-import com.savo.backend.model.BankAccount;
 import com.savo.backend.service.BankAccountService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users/{userId}/bank-accounts")
@@ -67,5 +65,14 @@ public class BankAccountController {
 
         BankAccountResponseDTO deactivatedAccount = bankAccountService.deactivateBankAccount(userId, accountId);
         return ResponseEntity.ok(deactivatedAccount);
+    }
+
+    @PutMapping("/{accountId}/activate")
+    public ResponseEntity<BankAccountResponseDTO> activateBankAccount(
+            @PathVariable String userId,
+            @PathVariable String accountId) {
+
+        BankAccountResponseDTO activatedAccount = bankAccountService.activateBankAccount(userId, accountId);
+        return ResponseEntity.ok(activatedAccount);
     }
 }

@@ -85,6 +85,17 @@ public class BankAccountService {
         return BankAccountResponseDTO.from(account);
     }
 
+    public BankAccountResponseDTO activateBankAccount(String userId, String accountId) {
+        BankAccount account = bankAccountRepository.findByUserIdAndId(userId, accountId)
+                .orElseThrow(() -> new EntityNotFoundException("Account not found or access denied"));
+
+        account.setActive(true);
+        account.setUpdatedAt(LocalDateTime.now());
+        bankAccountRepository.save(account);
+
+        return BankAccountResponseDTO.from(account);
+    }
+
     private String maskAccountNumber(String fullNumber) {
         if (fullNumber.length() <= 4) return fullNumber;
         return "****" + fullNumber.substring(fullNumber.length() - 4);
