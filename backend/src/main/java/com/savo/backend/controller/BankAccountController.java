@@ -32,4 +32,11 @@ public class BankAccountController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    @GetMapping
+    public ResponseEntity<List<BankAccountResponseDTO>> getAllBankAccounts(
+            @PathVariable String userId) {
+
+        List<BankAccountResponseDTO> bankAccounts = bankAccountService.getUserBankAccounts(userId);
+        return ResponseEntity.ok(bankAccounts);
+    }
 }
