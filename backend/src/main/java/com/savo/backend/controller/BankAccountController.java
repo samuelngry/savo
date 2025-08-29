@@ -63,5 +63,9 @@ public class BankAccountController {
     @DeleteMapping("/{accountId}")
     public ResponseEntity<BankAccountResponseDTO> deleteBankAccount(
             @PathVariable String userId,
-            @PathVariable String accountId)
+            @PathVariable String accountId) {
+
+        BankAccountResponseDTO deactivatedAccount = bankAccountService.deactivateBankAccount(userId, accountId);
+        return ResponseEntity.ok(deactivatedAccount);
+    }
 }
