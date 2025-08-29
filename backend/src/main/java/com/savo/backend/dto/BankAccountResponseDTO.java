@@ -12,6 +12,7 @@ public class BankAccountResponseDTO {
     private String accountNickname;
     private Boolean isActive;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public static BankAccountResponseDTO from(BankAccount bankAccount) {
         BankAccountResponseDTO dto = new BankAccountResponseDTO();
@@ -22,6 +23,7 @@ public class BankAccountResponseDTO {
         dto.accountNickname = bankAccount.getAccountNickname();
         dto.isActive = bankAccount.getActive();
         dto.createdAt = bankAccount.getCreatedAt();
+        dto.updatedAt = bankAccount.getUpdatedAt();
         return dto;
     }
 
@@ -79,5 +81,13 @@ public class BankAccountResponseDTO {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
