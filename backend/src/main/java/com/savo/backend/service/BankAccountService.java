@@ -42,6 +42,13 @@ public class BankAccountService {
         return BankAccountResponseDTO.from(saved);
     }
 
+    public BankAccountResponseDTO getBankAccount(String userId, String bankAccountId) {
+        BankAccount bankAccount = bankAccountRepository.findByUserIdAndId(userId, bankAccountId)
+                .orElseThrow(() -> new EntityNotFoundException("Bank account not found or access denied"));
+
+        return BankAccountResponseDTO.from(bankAccount);
+    }
+
     public List<BankAccountResponseDTO> getUserBankAccounts(String userId) {
         List<BankAccount> bankAccounts = bankAccountRepository.findByUserIdAndIsActiveTrue(userId);
 

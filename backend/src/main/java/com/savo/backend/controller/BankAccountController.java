@@ -39,4 +39,14 @@ public class BankAccountController {
         List<BankAccountResponseDTO> bankAccounts = bankAccountService.getUserBankAccounts(userId);
         return ResponseEntity.ok(bankAccounts);
     }
+
+    @GetMapping("/{accountId}")
+    public ResponseEntity<BankAccountResponseDTO> getBankAccount(
+            @PathVariable String userId,
+            @PathVariable String accountId) {
+
+        BankAccountResponseDTO bankAccount =  bankAccountService.getBankAccount(userId, accountId);
+        return ResponseEntity.ok(bankAccount);
+    }
+
 }
