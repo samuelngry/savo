@@ -60,4 +60,8 @@ public class BankAccountController {
         return ResponseEntity.ok(updated);
     }
 
+    @DeleteMapping("/{accountId}")
+    public ResponseEntity<BankAccountResponseDTO> deleteBankAccount(
+            @PathVariable String userId,
+            @PathVariable String accountId)
 }

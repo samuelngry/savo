@@ -4,7 +4,6 @@ import com.savo.backend.dto.BankAccountCreateDTO;
 import com.savo.backend.dto.BankAccountResponseDTO;
 import com.savo.backend.dto.BankAccountUpdateDTO;
 import com.savo.backend.model.BankAccount;
-import com.savo.backend.model.User;
 import com.savo.backend.repository.BankAccountRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -73,6 +72,17 @@ public class BankAccountService {
 
         BankAccount updated = bankAccountRepository.save(existingAccount);
         return BankAccountResponseDTO.from(updated);
+    }
+
+    public BankAccountResponseDTO deactivateBankAccount(String userId, String accountId) {
+        BankAccount account = bankAccountRepository.findByUserIdAndId(userId, accountId)
+                .orElseThrow(() -> new EntityNotFoundException("Account not found or access denied"));
+
+        account.setActive(false);
+        account.setUpdatedAt(LocalDateTime.now());
+        bankAccountRepository.save(account);
+
+        return BankAccountResponseDTO.from(account);
     }
 
     private String maskAccountNumber(String fullNumber) {
