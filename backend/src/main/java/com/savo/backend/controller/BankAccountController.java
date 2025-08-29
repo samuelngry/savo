@@ -2,6 +2,7 @@ package com.savo.backend.controller;
 
 import com.savo.backend.dto.BankAccountCreateDTO;
 import com.savo.backend.dto.BankAccountResponseDTO;
+import com.savo.backend.dto.BankAccountUpdateDTO;
 import com.savo.backend.model.BankAccount;
 import com.savo.backend.service.BankAccountService;
 import jakarta.validation.Valid;
@@ -47,6 +48,16 @@ public class BankAccountController {
 
         BankAccountResponseDTO bankAccount =  bankAccountService.getBankAccount(userId, accountId);
         return ResponseEntity.ok(bankAccount);
+    }
+
+    @PutMapping("/{accountId}")
+    public ResponseEntity<BankAccountResponseDTO> updateBankAccount(
+            @PathVariable String userId,
+            @PathVariable String accountId,
+            @Valid @RequestBody BankAccountUpdateDTO updateDTO) {
+
+        BankAccountResponseDTO updated = bankAccountService.updateBankAccount(userId, accountId, updateDTO);
+        return ResponseEntity.ok(updated);
     }
 
 }
