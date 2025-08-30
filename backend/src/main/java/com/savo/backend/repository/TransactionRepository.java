@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<Transaction, String> {
 
-    List<Transaction> findByUser(User user);
+    List<Transaction> findByUserId(String userId);
     List<Transaction> findByBankAccount(BankAccount bankAccount);
     List<Transaction> findByTransactionDate(LocalDate date);
     List<Transaction> findByUserAndTransactionDate(User user, LocalDate date);

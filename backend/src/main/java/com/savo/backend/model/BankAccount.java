@@ -14,9 +14,6 @@ public class BankAccount {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "user_id", nullable = false)
-    private String userId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -168,13 +165,5 @@ public class BankAccount {
 
     public void setStatementUploads(List<StatementUpload> statementUploads) {
         this.statementUploads = statementUploads;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 }

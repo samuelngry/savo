@@ -4,7 +4,9 @@ import com.savo.backend.dto.BankAccountCreateDTO;
 import com.savo.backend.dto.BankAccountResponseDTO;
 import com.savo.backend.dto.BankAccountUpdateDTO;
 import com.savo.backend.model.BankAccount;
+import com.savo.backend.model.User;
 import com.savo.backend.repository.BankAccountRepository;
+import com.savo.backend.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +19,20 @@ import java.util.stream.Collectors;
 public class BankAccountService {
 
     private final BankAccountRepository bankAccountRepository;
+    private final UserRepository userRepository;
 
-    public BankAccountService(BankAccountRepository bankAccountRepository) {
+    public BankAccountService(BankAccountRepository bankAccountRepository, UserRepository userRepository) {
         this.bankAccountRepository = bankAccountRepository;
+        this.userRepository = userRepository;
     }
 
     public BankAccountResponseDTO createBankAccount(String userId, BankAccountCreateDTO createDTO) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
         // Convert DTO to entity
         BankAccount bankAccount = new BankAccount();
-        bankAccount.setUserId(userId);
+        bankAccount.setUser(user);
         bankAccount.setBankName(createDTO.getBankName());
         bankAccount.setAccountType(createDTO.getAccountType());
 
