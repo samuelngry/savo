@@ -38,4 +38,13 @@ public class TransactionController {
         List<TransactionResponseDTO> transactions = transactionService.getUserTransactions(userId);
         return ResponseEntity.ok(transactions);
     }
+
+    @GetMapping("/{transactionId}")
+    public ResponseEntity<TransactionResponseDTO> getTransaction(
+            @PathVariable String userId,
+            @PathVariable String transactionId) {
+
+        TransactionResponseDTO transaction = transactionService.getTransaction(userId, transactionId);
+        return ResponseEntity.ok(transaction);
+    }
 }
