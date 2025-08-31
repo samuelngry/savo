@@ -33,4 +33,23 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     List<Transaction> findByUserIdAndTransactionTypeOrderByTransactionDateDesc(String userId, TransactionType transactionType);
     List<Transaction> findByUserIdAndCategoryIdOrderByTransactionDateDesc(String userId, String categoryId);
 
+    // Analytics
+
+    // Total spending/income for user
+    @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.user.id = :userId AND t.transactionType = :type")
+    BigDecimal sumAmountByUserIdAndTransactionType(@Param("userId") String userId, @Param("type") TransactionType type);
+
+    // Monthly spending by category
+    @Query("SELECT t.category.name, SUM(t.amount) FROM Transaction t " + "WHERE t.user.id = :userId AND t.transactionType = 'Debit' " +
+    "AND t.transactionDate BETWEEN :startDate and :endDate " + "GROUP BY t.category.id, t.category.name " + "ORDER BY SUM(t.amount) DESC")
+    List<Object[]> getSpendingByCategoryForPeriod(
+            @Param("userId") String userId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    // Recent transactions (limit)
+    @Query("SELECT t FROM Transaction t WHERE t.user.id = :userId ORDER BY t.transactionDate DESC, t.createdAt DESC LIMIT :limit")
+    List<Transaction> findRecentTransactions(@Param("userId") String userId, @Param("limit") int limit);
+
+    long countByUserId(String userId);
 }
