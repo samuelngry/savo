@@ -13,13 +13,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-// View all transactions for a bank account
-// Filter by date, category, or amount
-// Add manual transactions
-// Delete/undo a transaction
-// Edit category or merchant
-// Mark as subscription
-
 public interface TransactionRepository extends JpaRepository<Transaction, String> {
 
     // Get all transactions for a user, ordered by date
