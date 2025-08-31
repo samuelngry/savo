@@ -12,7 +12,7 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
     List<Category> findByUser(User user);
     List<Category> findByUserAndIsActiveTrue(User user);
 
-    Optional<Category> findByIdAndUser(String id, User user);
+    Optional<Category> findByUserIdAndId(String userId, String categoryId);
 
     // Get only parent categories (those without a parent)
     List<Category> findByUserAndParentCategoryIsNullAndIsActiveTrue(User user);
