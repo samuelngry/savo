@@ -58,4 +58,13 @@ public class TransactionController {
         TransactionResponseDTO updatedTransaction = transactionService.updateTransaction(userId, transactionId, dto);
         return ResponseEntity.ok(updatedTransaction);
     }
+
+    @DeleteMapping("/{transactionId}")
+    public ResponseEntity<TransactionResponseDTO> deleteTransaction(
+            @PathVariable String userId,
+            @PathVariable String transactionId) {
+
+        transactionService.deleteTransaction(userId, transactionId);
+        return ResponseEntity.noContent().build();
+    }
 }
