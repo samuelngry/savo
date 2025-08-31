@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionService {
@@ -60,6 +62,14 @@ public class TransactionService {
 
         Transaction savedTransaction = transactionRepository.save(transaction);
         return TransactionResponseDTO.from(savedTransaction);
+    }
+
+    public List<TransactionResponseDTO> getUserTransactions(String userId) {
+        List<Transaction> transactions = transactionRepository.findByUserIdOrderByTransactionDateDesc(userId);
+
+        return transactions.stream()
+                .map(TransactionResponseDTO::from)
+                .collect(Collectors.toList());
     }
 
     private void setPatternRecognitionData(Transaction transaction) {
