@@ -118,6 +118,17 @@ public class TransactionService {
         return TransactionResponseDTO.from(updatedTransaction);
     }
 
+    public void deleteTransaction(String userId, String transactionId) {
+        Transaction transaction = transactionRepository.findByUserIdAndId(userId, transactionId)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + transactionId));
+
+        if (transaction.getStatementUpload() != null) {
+            throw new IllegalStateException("Cannot delete transaction imported from bank statement. Please contact support.");
+        }
+
+        transactionRepository.delete(transaction);
+    }
+
     private void setPatternRecognitionData(Transaction transaction) {
         LocalDate date = transaction.getTransactionDate();
 
