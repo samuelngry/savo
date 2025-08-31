@@ -2,6 +2,7 @@ package com.savo.backend.controller;
 
 import com.savo.backend.dto.TransactionCreateDTO;
 import com.savo.backend.dto.TransactionResponseDTO;
+import com.savo.backend.dto.TransactionUpdateDTO;
 import com.savo.backend.model.Transaction;
 import com.savo.backend.service.TransactionService;
 import jakarta.validation.Valid;
@@ -46,5 +47,15 @@ public class TransactionController {
 
         TransactionResponseDTO transaction = transactionService.getTransaction(userId, transactionId);
         return ResponseEntity.ok(transaction);
+    }
+
+    @PutMapping("/{transactionId}")
+    public ResponseEntity<TransactionResponseDTO> updateTransaction(
+            @PathVariable String userId,
+            @PathVariable String transactionId,
+            @Valid @RequestBody TransactionUpdateDTO dto) {
+
+        TransactionResponseDTO updatedTransaction = transactionService.updateTransaction(userId, transactionId, dto);
+        return ResponseEntity.ok(updatedTransaction);
     }
 }
