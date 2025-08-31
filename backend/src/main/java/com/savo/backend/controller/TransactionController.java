@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users/{userId}/transactions")
 @CrossOrigin(origins = "*")
@@ -27,5 +29,13 @@ public class TransactionController {
 
         TransactionResponseDTO createdTransaction = transactionService.createTransaction(userId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTransaction);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TransactionResponseDTO>> getTransactions(
+            @PathVariable String userId) {
+
+        List<TransactionResponseDTO> transactions = transactionService.getUserTransactions(userId);
+        return ResponseEntity.ok(transactions);
     }
 }
