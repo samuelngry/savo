@@ -52,7 +52,6 @@ public class TransactionService {
         transaction.setCategory(category);
         transaction.setTransactionType(dto.getTransactionType());
         transaction.setMerchantName(dto.getMerchantName());
-        transaction.setBalanceAfter(dto.getBalanceAfter());
 
         // Use merchant name if description not provided
         transaction.setDescription(dto.getMerchantName());
@@ -136,9 +135,6 @@ public class TransactionService {
         DayOfWeek dayOfWeek = date.getDayOfWeek();
         transaction.setWeekend(dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY);
 
-        // Initialise subscription fields to defaults for manual entries
-        if (transaction.getSubscription() != null) {
-            transaction.setSubscription(false);
-        }
+        transaction.setSubscription(false);
     }
 }
