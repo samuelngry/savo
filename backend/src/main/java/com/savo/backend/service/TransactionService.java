@@ -72,6 +72,13 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
+    public TransactionResponseDTO getTransaction(String userId, String transactionId) {
+        Transaction transaction = transactionRepository.findByUserIdAndId(userId, transactionId)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + transactionId));
+
+        return TransactionResponseDTO.from(transaction);
+    }
+
     private void setPatternRecognitionData(Transaction transaction) {
         LocalDate date = transaction.getTransactionDate();
 
