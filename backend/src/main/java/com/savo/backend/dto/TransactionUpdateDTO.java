@@ -26,8 +26,6 @@ public class TransactionUpdateDTO {
 
     private String categoryId;
 
-    private BigDecimal balanceAfter;
-
     public TransactionUpdateDTO() {}
 
     public LocalDate getTransactionDate() {
@@ -76,13 +74,5 @@ public class TransactionUpdateDTO {
 
     public void setCategoryId(String categoryId) {
         this.categoryId = categoryId;
-    }
-
-    public BigDecimal getBalanceAfter() {
-        return balanceAfter;
-    }
-
-    public void setBalanceAfter(BigDecimal balanceAfter) {
-        this.balanceAfter = balanceAfter;
     }
 }

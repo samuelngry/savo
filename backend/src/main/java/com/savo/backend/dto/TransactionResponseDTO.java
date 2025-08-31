@@ -15,7 +15,6 @@ public class TransactionResponseDTO {
     private String description;
     private BigDecimal amount;
     private TransactionType transactionType;
-    private BigDecimal balanceAfter;
     private String merchantName;
     private String categoryId;
     private String categoryName;
@@ -35,7 +34,6 @@ public class TransactionResponseDTO {
         dto.description = transaction.getDescription();
         dto.amount = transaction.getAmount();
         dto.transactionType = transaction.getTransactionType();
-        dto.balanceAfter = transaction.getBalanceAfter();
         dto.merchantName = transaction.getMerchantName();
         dto.isManuallyCategorized = transaction.getManuallyCategorized();
         dto.createdAt = transaction.getCreatedAt();
@@ -112,14 +110,6 @@ public class TransactionResponseDTO {
 
     public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
-    }
-
-    public BigDecimal getBalanceAfter() {
-        return balanceAfter;
-    }
-
-    public void setBalanceAfter(BigDecimal balanceAfter) {
-        this.balanceAfter = balanceAfter;
     }
 
     public String getMerchantName() {

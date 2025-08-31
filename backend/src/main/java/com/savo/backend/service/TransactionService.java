@@ -2,6 +2,7 @@ package com.savo.backend.service;
 
 import com.savo.backend.dto.TransactionCreateDTO;
 import com.savo.backend.dto.TransactionResponseDTO;
+import com.savo.backend.dto.TransactionUpdateDTO;
 import com.savo.backend.model.BankAccount;
 import com.savo.backend.model.Category;
 import com.savo.backend.model.Transaction;
@@ -77,6 +78,44 @@ public class TransactionService {
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + transactionId));
 
         return TransactionResponseDTO.from(transaction);
+    }
+
+    public TransactionResponseDTO updateTransaction(String userId, String transactionId, TransactionUpdateDTO dto) {
+        Transaction existingTransaction = transactionRepository.findByUserIdAndId(userId, transactionId)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction not found with id: " + transactionId));
+
+        if (dto.getAmount() != null) {
+            existingTransaction.setAmount(dto.getAmount());
+        }
+
+        if (dto.getTransactionDate() != null) {
+            existingTransaction.setTransactionDate(dto.getTransactionDate());
+            setPatternRecognitionData(existingTransaction);
+        }
+
+        if (dto.getTransactionType() != null) {
+            existingTransaction.setTransactionType(dto.getTransactionType());
+        }
+
+        if (dto.getDescription() != null) {
+            existingTransaction.setDescription(dto.getDescription());
+        }
+
+        if (dto.getMerchantName() != null) {
+            existingTransaction.setMerchantName(dto.getMerchantName());
+        }
+
+        if (dto.getCategoryId() != null) {
+            Category category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+            existingTransaction.setCategory(category);
+
+            existingTransaction.setCategoryConfidence(1.0);
+            existingTransaction.setManuallyCategorized(true);
+        }
+
+        Transaction updatedTransaction = transactionRepository.save(existingTransaction);
+        return TransactionResponseDTO.from(updatedTransaction);
     }
 
     private void setPatternRecognitionData(Transaction transaction) {
