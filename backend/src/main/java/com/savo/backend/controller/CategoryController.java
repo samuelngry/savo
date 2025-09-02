@@ -52,4 +52,11 @@ public class CategoryController {
         List<CategoryResponseDTO> incomes = categoryService.getIncomeCategoriesForUser(userId);
         return ResponseEntity.ok(incomes);
     }
+
+    @GetMapping("/expense")
+    public ResponseEntity<List<CategoryResponseDTO>> getAllExpenseCategories(
+            @PathVariable String userId) {
+        List<CategoryResponseDTO> expenses = categoryService.getExpenseCategoriesForUser(userId);
+        return ResponseEntity.ok(expenses);
+    }
 }
