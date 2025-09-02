@@ -108,4 +108,17 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(CategoryResponseDTO::from)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoryResponseDTO> searchCategories(String userId, String searchTerm) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User not found with id: " + userId);
+        }
+
+        List<Category> categories = categoryRepository.searchCategoriesForUser(userId, searchTerm);
+        return categories.stream()
+                .map(CategoryResponseDTO::from)
+                .collect(Collectors.toList());
+    }
 }
