@@ -1,224 +1,40 @@
 package com.savo.backend.service;
 
 import com.savo.backend.model.User;
-import com.savo.backend.repository.UserRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-@Service
-@Transactional
-public class UserService {
+public interface UserService {
+    User findOrCreateOAuthUser(String email, String firstName, String lastName, String provider, String providerId);
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    User handleGoogleLogin(String email, String firstName, String lastName, String googleId);
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    User createLocalUser(String email, String username, String password, String firstName, String lastName);
 
-    // OAuth Method
+    Optional<User> authenticateLocalUser(String emailOrUsername, String password);
 
-    public User findOrCreateOAuthUser(String email, String firstName, String lastName,
-                                      String provider, String providerId) {
+    User updateUserProfile(String id, String firstName, String lastName, String timezone, String currency);
 
-        // Try to find existing user by provider and providerId
-        Optional<User> existingOAuthUser = userRepository.findByProviderAndProviderId(provider, providerId);
-        if (existingOAuthUser.isPresent()) {
-            return existingOAuthUser.get();
-        }
+    boolean changePassword(String id, String currentPassword, String newPassword);
 
-        // If not found, try to find by email (user might have registered normally first)
-        Optional<User> existingEmailUser = userRepository.findByEmail(email);
-        if (existingEmailUser.isPresent()) {
-            User user = existingEmailUser.get();
-            // Link this OAuth account to existing user
-            user.setProvider(provider);
-            user.setProviderId(providerId);
-            user.setEmailVerified(true);
-            user.setUpdatedAt(LocalDateTime.now());
-            return userRepository.save(user);
-        }
+    User verifyEmail(String id);
 
-        // Create new OAuth user
-        User newUser = new User();
-        newUser.setId(UUID.randomUUID().toString());
-        newUser.setEmail(email);
-        newUser.setFirstName(firstName);
-        newUser.setLastName(lastName);
-        newUser.setProvider(provider);
-        newUser.setProviderId(providerId);
-        newUser.setEmailVerified(true);
-        newUser.setPasswordHash(null);
-        newUser.setCreatedAt(LocalDateTime.now());
-        newUser.setUpdatedAt(LocalDateTime.now());
+    Optional<User> findById(String id);
 
-        return userRepository.save(newUser);
-    }
+    Optional<User> findByEmail(String email);
 
-    public User handleGoogleLogin(String email, String firstName, String lastName, String googleId) {
-        return findOrCreateOAuthUser(email, firstName, lastName, "google", googleId);
-    }
+    List<User> getAllUsers();
 
-    // Traditional Login Method
+    String getUserFullName(User user);
 
-    public User createLocalUser(String email, String username, String password,
-                                String firstName, String lastName) {
+    long getTotalUserCount();
 
-        // Check if user already exists
-        if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("User with email " + email + " already exists");
-        }
+    boolean isEmailTaken(String email);
 
-        if (username != null && userRepository.existsByUsername(username)) {
-            throw new RuntimeException("Username " + username + " is already taken");
-        }
+    boolean isUsernameTaken(String username);
 
-        User user = new User();
-        user.setId(UUID.randomUUID().toString());
-        user.setEmail(email);
-        user.setUsername(username);
-        user.setPasswordHash(passwordEncoder.encode(password));
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setProvider("local");
-        user.setEmailVerified(false);
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
+    boolean isOAuthUser(String id);
 
-        return userRepository.save(user);
-    }
-
-    // Authenticate local user
-
-    public Optional<User> authenticateLocalUser(String emailOrUsername, String password) {
-        // Try to find by email first, then username
-        Optional<User> userOptional = userRepository.findByEmail(emailOrUsername);
-        if (userOptional.isEmpty()) {
-            userOptional = userRepository.findByUsername(emailOrUsername);
-        }
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            // Only authenticate local users
-            if ("local".equals(user.getProvider()) &&
-                user.getPasswordHash() != null &&
-                passwordEncoder.matches(password, user.getPasswordHash())) {
-
-                user.setUpdatedAt(LocalDateTime.now());
-                userRepository.save(user);
-                return Optional.of(user);
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    // Common User Methods
-
-    public Optional<User> findById(String id) {
-        return userRepository.findById(id);
-    }
-
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    public String getUserFullName(User user) {
-        if (user.getLastName() != null && !user.getLastName().trim().isEmpty()) {
-            return user.getFirstName() + " " + user.getLastName();
-        }
-        return user.getFirstName();
-    }
-
-    public User updateUserProfile(String id, String firstName, String lastName,
-                                  String timezone, String currency) {
-        User user = findById(id)
-                .orElseThrow(() -> new RuntimeException("User with id " + id + " not found"));
-
-        if (firstName != null && !firstName.trim().isEmpty()) {
-            user.setFirstName(firstName);
-        }
-        if (lastName != null) {
-            user.setLastName(lastName);
-        }
-        if (timezone != null) {
-            user.setTimezone(timezone);
-        }
-        if (currency != null) {
-            user.setCurrency(currency);
-        }
-
-        user.setUpdatedAt(LocalDateTime.now());
-        return userRepository.save(user);
-    }
-
-    public boolean changePassword(String id, String currentPassword, String newPassword) {
-        User user =  findById(id)
-                .orElseThrow(() -> new RuntimeException("User with id " + id + " not found"));
-
-        // Only local users can change password
-        if (!"local".equals(user.getProvider()) || user.getPasswordHash() == null) {
-            throw new RuntimeException("Cannot change password");
-        }
-
-        // Verify current password
-        if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
-            return false;
-        }
-
-        user.setPasswordHash(passwordEncoder.encode(newPassword));
-        user.setUpdatedAt(LocalDateTime.now());
-        userRepository.save(user);
-        return true;
-    }
-
-    public User verifyEmail(String id) {
-        User user = findById(id)
-                .orElseThrow(() -> new RuntimeException("User with id " + id + " not found"));
-
-        user.setEmailVerified(true);
-        user.setUpdatedAt(LocalDateTime.now());
-        return userRepository.save(user);
-    }
-
-    // Helper methods
-
-    public boolean isEmailTaken(String email) {
-        return userRepository.existsByEmail(email);
-    }
-
-    public boolean isUsernameTaken(String username) {
-        return userRepository.existsByUsername(username);
-    }
-
-    public boolean isOAuthUser(String id) {
-        return findById(id)
-                .map(user -> !"local".equals(user.getProvider()))
-                .orElse(false);
-    }
-
-    public long getTotalUserCount() {
-        return userRepository.count();
-    }
-
-    // For development/testing
-    public User createSampleUser(String email, String firstName, String lastName) {
-        if (userRepository.existsByEmail(email)) {
-            return userRepository.findByEmail(email).get();
-        }
-
-        return createLocalUser(email, null, "password123", firstName, lastName);
-    }
+    User createSampleUser(String email, String firstName, String lastName);
 }

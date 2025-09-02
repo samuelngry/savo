@@ -1,7 +1,7 @@
 package com.savo.backend.controller;
 
 import com.savo.backend.model.User;
-import com.savo.backend.service.UserService;
+import com.savo.backend.service.impl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +15,9 @@ import java.util.Optional;
 @CrossOrigin(origins = "*")
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
-    public UserController(UserService userService) {
+    public UserController(UserServiceImpl userService) {
         this.userService = userService;
     }
 
