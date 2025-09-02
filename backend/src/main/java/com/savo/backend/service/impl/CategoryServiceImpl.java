@@ -21,13 +21,11 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private final UserRepository userRepository;
-    private final CategoryService categoryService;
     private CategoryRepository categoryRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository, CategoryService categoryService) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
-        this.categoryService = categoryService;
     }
 
     @Override
