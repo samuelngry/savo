@@ -83,4 +83,16 @@ public class CategoryServiceImpl implements CategoryService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoryResponseDTO> getIncomeCategoriesForUser(String userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User not found with id: " + userId);
+        }
+
+        List<Category> incomeCategories = categoryRepository.findIncomeCategories(userId);
+        return incomeCategories.stream()
+                .map(CategoryResponseDTO::from)
+                .collect(Collectors.toList());
+    }
 }
