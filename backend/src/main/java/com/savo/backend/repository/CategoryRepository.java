@@ -53,6 +53,10 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
     // User's custom expense categories only
     List<Category> findByUserAndIsIncomeCategoryFalseAndIsActiveTrue(User user);
 
+    // Check if category belongs to user or is system category
+    @Query("SELECT c FROM Category c WHERE c.id = :categoryId AND (c.user.id = :userId OR c.user IS NULL) AND c.isIncomeCategory = :isIncome AND c.isActive = true ORDER BY c.name")
+    Optional<Category> findByIdAndUserAccess(@Param("categoryId") String categoryId, @Param("userId") String userId);
+
     // Search
     @Query("SELECT c FROM Category c WHERE (c.user.id = :userId OR c.user IS NULL) AND LOWER(c.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) AND c.isActive = true ORDER BY c.name")
     List<Category> searchCategoriesForUser(@Param("userId") String userId, @Param("searchTerm") String searchTerm);
