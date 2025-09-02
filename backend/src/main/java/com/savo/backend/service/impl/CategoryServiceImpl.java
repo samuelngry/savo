@@ -176,4 +176,13 @@ public class CategoryServiceImpl implements CategoryService {
         Category updatedCategory = categoryRepository.save(category);
         return CategoryResponseDTO.from(updatedCategory);
     }
+
+    @Override
+    public CategoryResponseDTO deleteCategory(String userId, String categoryId) {
+        Category category = categoryRepository.findByIdAndUserAccess(categoryId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
+
+        categoryRepository.delete(category);
+        return CategoryResponseDTO.from(category);
+    }
 }

@@ -15,4 +15,5 @@ public interface CategoryService {
     List<CategoryResponseDTO> searchCategories(String userId, String searchTerm);
     CategoryResponseDTO getCategory(String userId, String categoryId);
     CategoryResponseDTO updateCategory(String userId, String categoryId, CategoryUpdateDTO dto);
+    CategoryResponseDTO deleteCategory(String userId, String categoryId);
 }
