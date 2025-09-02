@@ -38,4 +38,11 @@ public class CategoryController {
         List<CategoryResponseDTO> categories = categoryService.getAllCategoriesForUser(userId);
         return ResponseEntity.ok(categories);
     }
+
+    @GetMapping("/parents")
+    public ResponseEntity<List<CategoryResponseDTO>> getAllParentCategories(
+            @PathVariable String userId) {
+        List<CategoryResponseDTO> parents = categoryService.getParentCategoriesForUser(userId);
+        return ResponseEntity.ok(parents);
+    }
 }
