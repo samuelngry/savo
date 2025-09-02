@@ -59,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional(readOnly = true)
     public List<CategoryResponseDTO> getAllCategoriesForUser(String userId) {
-        if (userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new EntityNotFoundException("User not found with id: " + userId);
         }
 
@@ -68,4 +68,19 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(CategoryResponseDTO::from)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoryResponseDTO> getParentCategoriesForUser(String userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User not found with id: " + userId);
+        }
+
+        List<Category> parentCategories = categoryRepository.findAllParentCategories(userId);
+
+        return parentCategories.stream()
+                .map(CategoryResponseDTO::from)
+                .collect(Collectors.toList());
+    }
+
 }

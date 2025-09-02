@@ -8,4 +8,5 @@ import java.util.List;
 public interface CategoryService {
     CategoryResponseDTO createCategory(String userId, CategoryCreateDTO dto);
     List<CategoryResponseDTO> getAllCategoriesForUser(String userId);
+    List<CategoryResponseDTO> getParentCategoriesForUser(String userId);
 }
