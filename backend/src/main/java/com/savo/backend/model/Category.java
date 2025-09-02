@@ -17,7 +17,7 @@ public class Category {
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @NotBlank(message = "Category name is required")
@@ -40,10 +40,10 @@ public class Category {
     private List<Category> subcategories;
 
     @Column(name = "is_income_category", nullable = false)
-    private boolean isIncomeCategory = false;
+    private Boolean isIncomeCategory = false;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+    private Boolean isActive = true;
 
     @Column(name = "budget_amount", precision = 10, scale = 2)
     private BigDecimal budgetAmount;
@@ -55,11 +55,19 @@ public class Category {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     public Category() {}
 
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
     public User getUser() {
@@ -118,19 +126,19 @@ public class Category {
         this.parentCategory = parentCategory;
     }
 
-    public boolean isIncomeCategory() {
+    public Boolean getIncomeCategory() {
         return isIncomeCategory;
     }
 
-    public void setIncomeCategory(boolean incomeCategory) {
+    public void setIncomeCategory(Boolean incomeCategory) {
         isIncomeCategory = incomeCategory;
     }
 
-    public boolean isActive() {
+    public Boolean getActive() {
         return isActive;
     }
 
-    public void setActive(boolean active) {
+    public void setActive(Boolean active) {
         isActive = active;
     }
 
@@ -156,5 +164,13 @@ public class Category {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
