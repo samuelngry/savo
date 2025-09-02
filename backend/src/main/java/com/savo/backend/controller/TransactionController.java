@@ -3,8 +3,7 @@ package com.savo.backend.controller;
 import com.savo.backend.dto.TransactionCreateDTO;
 import com.savo.backend.dto.TransactionResponseDTO;
 import com.savo.backend.dto.TransactionUpdateDTO;
-import com.savo.backend.model.Transaction;
-import com.savo.backend.service.TransactionService;
+import com.savo.backend.service.impl.TransactionServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +16,9 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class TransactionController {
 
-    private final TransactionService transactionService;
+    private final TransactionServiceImpl transactionService;
 
-    public TransactionController(TransactionService transactionService) {
+    public TransactionController(TransactionServiceImpl transactionService) {
         this.transactionService = transactionService;
     }
 
