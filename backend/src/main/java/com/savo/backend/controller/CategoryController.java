@@ -45,4 +45,11 @@ public class CategoryController {
         List<CategoryResponseDTO> parents = categoryService.getParentCategoriesForUser(userId);
         return ResponseEntity.ok(parents);
     }
+
+    @GetMapping("/income")
+    public ResponseEntity<List<CategoryResponseDTO>> getAllIncomeCategories(
+            @PathVariable String userId) {
+        List<CategoryResponseDTO> incomes = categoryService.getIncomeCategoriesForUser(userId);
+        return ResponseEntity.ok(incomes);
+    }
 }
