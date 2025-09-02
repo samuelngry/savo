@@ -1,5 +1,6 @@
 package com.savo.backend.service.impl;
 
+import com.savo.backend.dto.CategoryUpdateDTO;
 import com.savo.backend.enums.BudgetPeriod;
 import com.savo.backend.dto.CategoryCreateDTO;
 import com.savo.backend.dto.CategoryResponseDTO;
@@ -131,5 +132,48 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
 
         return CategoryResponseDTO.from(category);
+    }
+
+    @Override
+    public CategoryResponseDTO updateCategory(String userId, String categoryId, CategoryUpdateDTO dto) {
+        Category category = categoryRepository.findByIdAndUserAccess(categoryId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
+
+        if (dto.getName() != null) {
+            category.setName(dto.getName());
+        }
+
+        if (dto.getIcon() != null) {
+            category.setIcon(dto.getIcon());
+        }
+
+        if (dto.getColor() != null) {
+            category.setColor(dto.getColor());
+        }
+
+        if (dto.getIncomeCategory() != null) {
+            category.setIncomeCategory(dto.getIncomeCategory());
+        }
+
+        if (dto.getBudgetAmount() != null) {
+            category.setBudgetAmount(dto.getBudgetAmount());
+        }
+
+        if (dto.getActive() != null) {
+            category.setActive(dto.getActive());
+        }
+
+        if (dto.getParentCategoryId() != null) {
+            Category parent = categoryRepository.findByIdAndUserAccess(dto.getParentCategoryId(), userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Parent category not found with id: " + dto.getParentCategoryId()));
+            category.setParentCategory(parent);
+        }
+
+        if (dto.getBudgetPeriod() != null) {
+            category.setBudgetPeriod(BudgetPeriod.valueOf(dto.getBudgetPeriod()));
+        }
+
+        Category updatedCategory = categoryRepository.save(category);
+        return CategoryResponseDTO.from(updatedCategory);
     }
 }

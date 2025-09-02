@@ -2,6 +2,7 @@ package com.savo.backend.service;
 
 import com.savo.backend.dto.CategoryCreateDTO;
 import com.savo.backend.dto.CategoryResponseDTO;
+import com.savo.backend.dto.CategoryUpdateDTO;
 
 import java.util.List;
 
@@ -13,4 +14,5 @@ public interface CategoryService {
     List<CategoryResponseDTO> getExpenseCategoriesForUser(String userId);
     List<CategoryResponseDTO> searchCategories(String userId, String searchTerm);
     CategoryResponseDTO getCategory(String userId, String categoryId);
+    CategoryResponseDTO updateCategory(String userId, String categoryId, CategoryUpdateDTO dto);
 }
