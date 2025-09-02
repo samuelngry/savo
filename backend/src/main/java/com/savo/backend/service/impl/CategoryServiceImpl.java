@@ -20,11 +20,13 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private final UserRepository userRepository;
+    private final CategoryService categoryService;
     private CategoryRepository categoryRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository, CategoryService categoryService) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -120,5 +122,14 @@ public class CategoryServiceImpl implements CategoryService {
         return categories.stream()
                 .map(CategoryResponseDTO::from)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CategoryResponseDTO getCategory(String userId, String categoryId) {
+        Category category = categoryRepository.findByIdAndUserAccess(categoryId, userId)
+                .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
+
+        return CategoryResponseDTO.from(category);
     }
 }

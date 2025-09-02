@@ -12,4 +12,5 @@ public interface CategoryService {
     List<CategoryResponseDTO> getIncomeCategoriesForUser(String userId);
     List<CategoryResponseDTO> getExpenseCategoriesForUser(String userId);
     List<CategoryResponseDTO> searchCategories(String userId, String searchTerm);
+    CategoryResponseDTO getCategory(String userId, String categoryId);
 }
