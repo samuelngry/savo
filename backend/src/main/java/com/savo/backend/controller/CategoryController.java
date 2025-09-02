@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users/{userId}/categories")
 @CrossOrigin(origins = "*")
@@ -28,5 +30,12 @@ public class CategoryController {
             @Valid @RequestBody CategoryCreateDTO dto) {
         CategoryResponseDTO createdCategory = categoryService.createCategory(userId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CategoryResponseDTO>> getAllCategories(
+            @PathVariable String userId) {
+        List<CategoryResponseDTO> categories = categoryService.getAllCategoriesForUser(userId);
+        return ResponseEntity.ok(categories);
     }
 }
