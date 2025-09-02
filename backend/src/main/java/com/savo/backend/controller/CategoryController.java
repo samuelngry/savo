@@ -59,4 +59,12 @@ public class CategoryController {
         List<CategoryResponseDTO> expenses = categoryService.getExpenseCategoriesForUser(userId);
         return ResponseEntity.ok(expenses);
     }
+
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<CategoryResponseDTO> getCategory(
+            @PathVariable String userId,
+            @PathVariable String categoryId) {
+        CategoryResponseDTO category = categoryService.getCategory(userId, categoryId);
+        return ResponseEntity.ok(category);
+    }
 }
