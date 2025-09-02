@@ -9,8 +9,11 @@ import com.savo.backend.repository.CategoryRepository;
 import com.savo.backend.repository.UserRepository;
 import com.savo.backend.service.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -51,5 +54,18 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category savedCategory = categoryRepository.save(category);
         return CategoryResponseDTO.from(savedCategory);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<CategoryResponseDTO> getAllCategoriesForUser(String userId) {
+        if (userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("User not found with id: " + userId);
+        }
+
+        List<Category> categories = categoryRepository.findAllAvaliableForUser(userId);
+        return categories.stream()
+                .map(CategoryResponseDTO::from)
+                .collect(Collectors.toList());
     }
 }
