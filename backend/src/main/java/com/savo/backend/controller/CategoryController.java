@@ -2,6 +2,7 @@ package com.savo.backend.controller;
 
 import com.savo.backend.dto.CategoryCreateDTO;
 import com.savo.backend.dto.CategoryResponseDTO;
+import com.savo.backend.dto.CategoryUpdateDTO;
 import com.savo.backend.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -66,5 +67,14 @@ public class CategoryController {
             @PathVariable String categoryId) {
         CategoryResponseDTO category = categoryService.getCategory(userId, categoryId);
         return ResponseEntity.ok(category);
+    }
+
+    @PutMapping("/{categoryId}")
+    public ResponseEntity<CategoryResponseDTO> updateCategory(
+            @PathVariable String userId,
+            @PathVariable String categoryId,
+            @Valid @RequestBody CategoryUpdateDTO dto) {
+        CategoryResponseDTO updatedCategory = categoryService.updateCategory(userId, categoryId, dto);
+        return ResponseEntity.ok(updatedCategory);
     }
 }
