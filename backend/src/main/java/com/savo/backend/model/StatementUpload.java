@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class StatementUpload {
     private Integer totalTransactionsExtracted;
 
     @Column(name = "ocr_confidence_score", precision = 3, scale = 2)
-    private Double ocrConfidenceScore;
+    private BigDecimal ocrConfidenceScore;
 
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
@@ -196,11 +197,11 @@ public class StatementUpload {
         this.totalTransactionsExtracted = totalTransactionsExtracted;
     }
 
-    public Double getOcrConfidenceScore() {
+    public BigDecimal getOcrConfidenceScore() {
         return ocrConfidenceScore;
     }
 
-    public void setOcrConfidenceScore(Double ocrConfidenceScore) {
+    public void setOcrConfidenceScore(BigDecimal ocrConfidenceScore) {
         this.ocrConfidenceScore = ocrConfidenceScore;
     }
 
