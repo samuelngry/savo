@@ -3,9 +3,12 @@ package com.savo.backend.model;
 import com.savo.backend.enums.UploadStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "statement_upload")
@@ -28,6 +31,7 @@ public class StatementUpload {
     private String fileName;
 
     @Column(name = "file_size", nullable = false)
+    @Positive(message = "File size must be positive")
     private Long fileSize;
 
     @NotBlank(message = "S3 key is required")
@@ -36,7 +40,7 @@ public class StatementUpload {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "upload_status", nullable = false)
-    private UploadStatus uploadStatus = UploadStatus.Uploading;
+    private UploadStatus uploadStatus = UploadStatus.UPLOADING;
 
     @Column(name = "processing_started_at")
     private LocalDateTime processingStartedAt;
@@ -53,16 +57,43 @@ public class StatementUpload {
     @Column(name = "total_transactions_extracted")
     private Integer totalTransactionsExtracted;
 
-    @Column(name = "ocr_confidence_score")
+    @Column(name = "ocr_confidence_score", precision = 3, scale = 2)
     private Double ocrConfidenceScore;
 
-    @Column(name = "error_message")
+    @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @OneToMany(mappedBy = "statementUpload", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Transaction> transactions = new ArrayList<>();
+
     public StatementUpload() {}
+
+    public void startProcessing() {
+        this.uploadStatus = UploadStatus.PROCESSING;
+        this.processingStartedAt = LocalDateTime.now();
+    }
+
+    public void completeProcessing() {
+        this.uploadStatus = UploadStatus.COMPLETED;
+        this.processingCompletedAt = LocalDateTime.now();
+    }
+
+    public void failProcessing(String errorMessage) {
+        this.uploadStatus = UploadStatus.FAILED;
+        this.processingCompletedAt = LocalDateTime.now();
+        this.errorMessage = errorMessage;
+    }
+
+    public boolean isProcessingComplete() {
+        return uploadStatus == UploadStatus.COMPLETED;
+    }
+
+    public boolean hasProcessingFailed() {
+        return uploadStatus == UploadStatus.FAILED;
+    }
 
     @PrePersist
     public void prePersist() {
@@ -187,5 +218,13 @@ public class StatementUpload {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 }
