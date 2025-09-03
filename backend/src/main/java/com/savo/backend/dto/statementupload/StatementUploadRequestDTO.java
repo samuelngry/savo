@@ -29,4 +29,20 @@ public class StatementUploadRequestDTO {
     public boolean isValidFileSize(long maxSizeBytes) {
         return file != null && file.getSize() <= maxSizeBytes;
     }
+
+    public String getBankAccountId() {
+        return bankAccountId;
+    }
+
+    public void setBankAccountId(String bankAccountId) {
+        this.bankAccountId = bankAccountId;
+    }
+
+    public MultipartFile getFile() {
+        return file;
+    }
+
+    public void setFile(MultipartFile file) {
+        this.file = file;
+    }
 }
