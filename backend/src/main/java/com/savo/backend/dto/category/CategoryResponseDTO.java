@@ -1,10 +1,9 @@
-package com.savo.backend.dto;
+package com.savo.backend.dto.category;
 
 import com.savo.backend.model.Category;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryResponseDTO {

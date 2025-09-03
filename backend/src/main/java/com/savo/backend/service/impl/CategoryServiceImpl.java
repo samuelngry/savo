@@ -1,9 +1,9 @@
 package com.savo.backend.service.impl;
 
-import com.savo.backend.dto.CategoryUpdateDTO;
+import com.savo.backend.dto.category.CategoryUpdateDTO;
 import com.savo.backend.enums.BudgetPeriod;
-import com.savo.backend.dto.CategoryCreateDTO;
-import com.savo.backend.dto.CategoryResponseDTO;
+import com.savo.backend.dto.category.CategoryCreateDTO;
+import com.savo.backend.dto.category.CategoryResponseDTO;
 import com.savo.backend.model.Category;
 import com.savo.backend.model.User;
 import com.savo.backend.repository.CategoryRepository;

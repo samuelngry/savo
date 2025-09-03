@@ -1,8 +1,8 @@
 package com.savo.backend.controller;
 
-import com.savo.backend.dto.CategoryCreateDTO;
-import com.savo.backend.dto.CategoryResponseDTO;
-import com.savo.backend.dto.CategoryUpdateDTO;
+import com.savo.backend.dto.category.CategoryCreateDTO;
+import com.savo.backend.dto.category.CategoryResponseDTO;
+import com.savo.backend.dto.category.CategoryUpdateDTO;
 import com.savo.backend.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

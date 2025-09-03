@@ -1,8 +1,8 @@
 package com.savo.backend.service;
 
-import com.savo.backend.dto.BankAccountCreateDTO;
-import com.savo.backend.dto.BankAccountResponseDTO;
-import com.savo.backend.dto.BankAccountUpdateDTO;
+import com.savo.backend.dto.bankaccount.BankAccountCreateDTO;
+import com.savo.backend.dto.bankaccount.BankAccountResponseDTO;
+import com.savo.backend.dto.bankaccount.BankAccountUpdateDTO;
 
 import java.util.List;
 

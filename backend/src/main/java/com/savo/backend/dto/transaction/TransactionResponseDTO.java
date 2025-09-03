@@ -1,4 +1,4 @@
-package com.savo.backend.dto;
+package com.savo.backend.dto.transaction;
 
 import com.savo.backend.enums.TransactionType;
 import com.savo.backend.model.Transaction;

@@ -1,12 +1,11 @@
-package com.savo.backend.dto;
+package com.savo.backend.dto.category;
 
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 
-public class CategoryCreateDTO {
+public class CategoryUpdateDTO {
 
-    @NotBlank(message = "Category name is required")
     @Size(max = 100, message = "Category name too long")
     private String name;
 
@@ -18,7 +17,7 @@ public class CategoryCreateDTO {
 
     private String parentCategoryId;
 
-    private Boolean isIncomeCategory = false;
+    private Boolean isIncomeCategory;
 
     @DecimalMin(value = "0.01", message = "Budget amount must be positive")
     @Digits(integer = 8, fraction = 2)
@@ -26,7 +25,9 @@ public class CategoryCreateDTO {
 
     private String budgetPeriod;
 
-    public CategoryCreateDTO() {}
+    private Boolean isActive;
+
+    public CategoryUpdateDTO() {}
 
     public String getName() {
         return name;
@@ -36,20 +37,20 @@ public class CategoryCreateDTO {
         this.name = name;
     }
 
-    public String getIcon() {
-        return icon;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
     public String getColor() {
         return color;
     }
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
     public String getParentCategoryId() {
@@ -82,5 +83,13 @@ public class CategoryCreateDTO {
 
     public void setBudgetPeriod(String budgetPeriod) {
         this.budgetPeriod = budgetPeriod;
+    }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
     }
 }

@@ -1,8 +1,8 @@
 package com.savo.backend.service.impl;
 
-import com.savo.backend.dto.TransactionCreateDTO;
-import com.savo.backend.dto.TransactionResponseDTO;
-import com.savo.backend.dto.TransactionUpdateDTO;
+import com.savo.backend.dto.transaction.TransactionCreateDTO;
+import com.savo.backend.dto.transaction.TransactionResponseDTO;
+import com.savo.backend.dto.transaction.TransactionUpdateDTO;
 import com.savo.backend.model.BankAccount;
 import com.savo.backend.model.Category;
 import com.savo.backend.model.Transaction;

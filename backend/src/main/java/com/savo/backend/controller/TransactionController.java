@@ -1,8 +1,8 @@
 package com.savo.backend.controller;
 
-import com.savo.backend.dto.TransactionCreateDTO;
-import com.savo.backend.dto.TransactionResponseDTO;
-import com.savo.backend.dto.TransactionUpdateDTO;
+import com.savo.backend.dto.transaction.TransactionCreateDTO;
+import com.savo.backend.dto.transaction.TransactionResponseDTO;
+import com.savo.backend.dto.transaction.TransactionUpdateDTO;
 import com.savo.backend.service.impl.TransactionServiceImpl;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

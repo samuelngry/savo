@@ -1,4 +1,4 @@
-package com.savo.backend.dto;
+package com.savo.backend.dto.bankaccount;
 
 public class BankAccountUpdateDTO {
 

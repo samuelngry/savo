@@ -1,8 +1,8 @@
 package com.savo.backend.service;
 
-import com.savo.backend.dto.TransactionCreateDTO;
-import com.savo.backend.dto.TransactionResponseDTO;
-import com.savo.backend.dto.TransactionUpdateDTO;
+import com.savo.backend.dto.transaction.TransactionCreateDTO;
+import com.savo.backend.dto.transaction.TransactionResponseDTO;
+import com.savo.backend.dto.transaction.TransactionUpdateDTO;
 
 import java.util.List;
 
