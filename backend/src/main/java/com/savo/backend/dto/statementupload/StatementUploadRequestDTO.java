@@ -25,4 +25,8 @@ public class StatementUploadRequestDTO {
         String fileName = file.getOriginalFilename().toLowerCase();
         return fileName.endsWith(".pdf");
     }
+
+    public boolean isValidFileSize(long maxSizeBytes) {
+        return file != null && file.getSize() <= maxSizeBytes;
+    }
 }
