@@ -14,6 +14,4 @@ public class StatementUploadServiceImpl implements StatementUploadService {
     public StatementUploadServiceImpl(StatementUploadRepository statementUploadRepository) {
         this.statementUploadRepository = statementUploadRepository;
     }
-
-
 }
