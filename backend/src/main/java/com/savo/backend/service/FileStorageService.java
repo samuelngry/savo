@@ -96,6 +96,24 @@ public class FileStorageService {
         }
     }
 
+    public boolean fileExists(String s3Key) {
+        try {
+            HeadObjectRequest headObjectRequest = HeadObjectRequest.builder()
+                    .bucket(s3Properties.getBucket())
+                    .key(s3Key)
+                    .build();
+
+            s3Client.headObject(headObjectRequest);
+            return true;
+
+        } catch (NoSuchKeyException e) {
+            return false;
+        } catch (S3Exception e) {
+            logger.error("Error checking if file exists in S3: bucket={}, key={}, error={}", s3Properties.getBucket(), s3Key, e.awsErrorDetails().errorMessage(), e);
+            return false;
+        }
+    }
+
     private void validateFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new ValidationException("File cannot be null or empty");
