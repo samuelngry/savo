@@ -116,4 +116,8 @@ public class FileStorageService {
 
         return String.format("%s/%s/%d/%02d/%02d/%s_%s", folder, userId, now.getYear(), now.getMonthValue(), now.getDayOfMonth(), timestamp, sanitizedFileName);
     }
+
+    private String sanitizeFilename(String fileName) {
+        return fileName.replaceAll("[^a-zA-Z0-9_-]", "_");
+    }
 }
