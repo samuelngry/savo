@@ -22,6 +22,9 @@ spring:
       name: admin
       password: admin123
 
+  aws:
+    region: ap-southeast-1
+
 logging:
   level:
     com.savo: DEBUG
