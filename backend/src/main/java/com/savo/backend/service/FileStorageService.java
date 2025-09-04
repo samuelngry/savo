@@ -15,6 +15,7 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -119,5 +120,17 @@ public class FileStorageService {
 
     private String sanitizeFilename(String fileName) {
         return fileName.replaceAll("[^a-zA-Z0-9_-]", "_");
+    }
+
+    private Map<String, String> createFileMetadata(MultipartFile file, String userId) {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("user-id", userId);
+        metadata.put("filename", file.getOriginalFilename());
+        metadata.put("upload-timestamp", LocalDateTime.now().toString());
+        metadata.put("content-type", file.getContentType());
+        metadata.put("file-size", String.valueOf(file.getSize()));
+        metadata.put("application", "savo");
+
+        return metadata;
     }
 }
