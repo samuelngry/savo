@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.model.ServerSideEncryption;
@@ -55,6 +56,20 @@ public class FileStorageService {
         } catch (S3Exception e) {
             logger.error("S3 upload failed: bucket={}, key={}, error={}", s3Properties.getBucket(), s3Key, e.awsErrorDetails().errorCode(), e);
             throw new ValidationException("File upload failed: " + e.awsErrorDetails().errorMessage());
+        }
+    }
+
+    public void deleteFile(String s3Key) {
+        try {
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(s3Properties.getBucket())
+                    .key(s3Key)
+                    .build();
+
+            s3Client.deleteObject(deleteObjectRequest);
+            logger.info("Successfully delete file from S3: bucket={}, key={}", s3Properties.getBucket(), s3Key);
+        } catch (S3Exception e) {
+            logger.error("Failed to delete file from S3: bucket={}, key={}, error={}", s3Properties.getBucket(), s3Key, e.awsErrorDetails().errorMessage(), e);
         }
     }
 }
