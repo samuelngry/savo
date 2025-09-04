@@ -93,4 +93,18 @@ public class FileStorageService {
             throw new ValidationException("Failed to generate download URL");
         }
     }
+
+    private void validateFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new ValidationException("File cannot be null or empty");
+        }
+
+        if (file.getSize() > s3Properties.getMaxFileSize()) {
+            throw new ValidationException("File size exceeds maximum allowed: " + s3Properties.getMaxFileSize());
+        }
+
+        if (!"application/pdf".equals(file.getContentType())) {
+            throw new ValidationException("Only PDF files are allowed");
+        }
+    }
 }
