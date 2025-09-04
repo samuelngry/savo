@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
-import software.amazon.awssdk.services.s3.model.ServerSideEncryption;
+import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Map;
 
 @Service
@@ -70,6 +70,27 @@ public class FileStorageService {
             logger.info("Successfully delete file from S3: bucket={}, key={}", s3Properties.getBucket(), s3Key);
         } catch (S3Exception e) {
             logger.error("Failed to delete file from S3: bucket={}, key={}, error={}", s3Properties.getBucket(), s3Key, e.awsErrorDetails().errorMessage(), e);
+        }
+    }
+
+    public String getPresignedDownloadUrl(String s3Key) {
+        try (S3Presigner presigner = S3Presigner.create()) {
+
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                    .bucket(s3Properties.getBucket())
+                    .key(s3Key)
+                    .build();
+
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofMinutes(s3Properties.getUrlExpirationMinutes()))
+                    .getObjectRequest(getObjectRequest)
+                    .build();
+
+            return presigner.presignGetObject(presignRequest).url().toString();
+
+        } catch (S3Exception e) {
+            logger.error("Failed to generate presigned URL: key={}, error={}", s3Key, e.awsErrorDetails().errorMessage(), e);
+            throw new ValidationException("Failed to generate download URL");
         }
     }
 }
