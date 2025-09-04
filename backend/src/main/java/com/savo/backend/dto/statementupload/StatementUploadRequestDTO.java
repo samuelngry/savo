@@ -1,5 +1,6 @@
 package com.savo.backend.dto.statementupload;
 
+import com.savo.backend.model.StatementUpload;
 import jakarta.validation.constraints.*;
 import org.springframework.web.multipart.MultipartFile;
 
