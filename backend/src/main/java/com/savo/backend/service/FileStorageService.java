@@ -14,6 +14,7 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service
@@ -106,5 +107,13 @@ public class FileStorageService {
         if (!"application/pdf".equals(file.getContentType())) {
             throw new ValidationException("Only PDF files are allowed");
         }
+    }
+
+    private String generateS3Key(String userId, String folder, String fileName) {
+        LocalDateTime now = LocalDateTime.now();
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String sanitizedFileName = sanitizeFilename(fileName);
+
+        return String.format("%s/%s/%d/%02d/%02d/%s_%s", folder, userId, now.getYear(), now.getMonthValue(), now.getDayOfMonth(), timestamp, sanitizedFileName);
     }
 }
