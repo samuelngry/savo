@@ -17,8 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional
@@ -102,5 +107,48 @@ public class StatementUploadService {
             logger.error("Failed to perform deep duplicate validation: {}", e.getMessage(), e);
             validateBasicFileDuplicate(file, bankAccount);
         }
+    }
+
+    // TODO: Check each bank patterns matches
+    private LocalDate[] extractStatementPeriod(MultipartFile file, String bankAccountName) throws IOException {
+        String pdfText = extractPDFText(file, 2);
+
+        Pattern periodPattern = null;
+        DateTimeFormatter dateFormatter = null;
+
+        switch (bankAccountName.toUpperCase()) {
+            case "DBS":
+                // "Statement Period: 01 Jan 2024 to 31 Jan 2024"
+                periodPattern = Pattern.compile("Statement Period[:\\s]+(\\d{1,2}\\s+\\w{3}\\s+\\d{4})\\s+to\\s+(\\d{1,2}\\s+\\w{3}\\s+\\d{4})", Pattern.CASE_INSENSITIVE);
+                dateFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
+                break;
+
+            case "OCBC":
+                // "From 01/01/2024 To 31/01/2024"
+                periodPattern = Pattern.compile("From\\s+(\\d{2}/\\d{2}/\\d{4})\\s+To\\s+(\\d{2}/\\d{2}/\\d{4})", Pattern.CASE_INSENSITIVE);
+                dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                break;
+
+            case "UOB":
+                // "Period: 01 Jan 2024 - 31 Jan 2024"
+                periodPattern = Pattern.compile("Period[:\\s]+(\\d{1,2}\\s+\\w{3}\\s+\\d{4})\\s*[-–]\\s*(\\d{1,2}\\s+\\w{3}\\s+\\d{4})", Pattern.CASE_INSENSITIVE);
+                dateFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
+                break;
+        }
+
+        if (periodPattern != null && dateFormatter != null) {
+            Matcher matcher = periodPattern.matcher(pdfText);
+            if (matcher.find()) {
+                try {
+                    LocalDate startDate = LocalDate.parse(matcher.group(1).trim(), dateFormatter);
+                    LocalDate endDate = LocalDate.parse(matcher.group(2).trim(), dateFormatter);
+                    return new LocalDate[]{startDate, endDate};
+                } catch (Exception e) {
+                    logger.warn("Failed to parse dates: {} to {}", matcher.group(1), matcher.group(2));
+                }
+            }
+        }
+
+        return null;
     }
 }
