@@ -118,26 +118,27 @@ public class StatementUploadService {
 
         switch (bankAccountName.toUpperCase()) {
             case "DBS":
-                // "Statement Period: 01 Jan 2024 to 31 Jan 2024"
-                periodPattern = Pattern.compile("Statement Period[:\\s]+(\\d{1,2}\\s+\\w{3}\\s+\\d{4})\\s+to\\s+(\\d{1,2}\\s+\\w{3}\\s+\\d{4})", Pattern.CASE_INSENSITIVE);
+                // "as at 31 Jul 2025"
+                periodPattern = Pattern.compile("as at (\\d{1,2}\\s+\\w{3}\\s+\\d{4})", Pattern.CASE_INSENSITIVE);
                 dateFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
                 break;
 
             case "OCBC":
-                // "From 01/01/2024 To 31/01/2024"
-                periodPattern = Pattern.compile("From\\s+(\\d{2}/\\d{2}/\\d{4})\\s+To\\s+(\\d{2}/\\d{2}/\\d{4})", Pattern.CASE_INSENSITIVE);
-                dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                // "01 Jan 2024 TO 31 Jan 2024"
+                periodPattern = Pattern.compile("(\\d{1,2}\\s+\\w{3}\\s+\\d{4})\\s+TO\\s+(\\d{1,2}\\s+\\w{3}\\s+\\d{4})", Pattern.CASE_INSENSITIVE);
+                dateFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
                 break;
 
             case "UOB":
-                // "Period: 01 Jan 2024 - 31 Jan 2024"
-                periodPattern = Pattern.compile("Period[:\\s]+(\\d{1,2}\\s+\\w{3}\\s+\\d{4})\\s*[-–]\\s*(\\d{1,2}\\s+\\w{3}\\s+\\d{4})", Pattern.CASE_INSENSITIVE);
+                // "Period: 01 Jan 2024 to 31 Jan 2024"
+                periodPattern = Pattern.compile("Period[:\\s]+(\\d{1,2}\\s+\\w{3}\\s+\\d{4})\\s+to\\s+(\\d{1,2}\\s+\\w{3}\\s+\\d{4})", Pattern.CASE_INSENSITIVE);
                 dateFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
                 break;
         }
 
         if (periodPattern != null && dateFormatter != null) {
             Matcher matcher = periodPattern.matcher(pdfText);
+
             if (matcher.find()) {
                 try {
                     LocalDate startDate = LocalDate.parse(matcher.group(1).trim(), dateFormatter);
