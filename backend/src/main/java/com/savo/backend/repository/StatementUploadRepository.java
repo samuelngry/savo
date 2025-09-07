@@ -2,6 +2,7 @@ package com.savo.backend.repository;
 
 import com.savo.backend.enums.UploadStatus;
 import com.savo.backend.model.StatementUpload;
+import com.savo.backend.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -44,4 +45,6 @@ public interface StatementUploadRepository extends JpaRepository<StatementUpload
     // Delete old failed uploads
     @Query("DELETE FROM StatementUpload su WHERE su.uploadStatus = 'FAILED' AND su.createdAt < :cutoffDate")
     void deleteFailedUploadsForUser(@Param("cutoffDate") LocalDateTime cutoffDate);
+
+    String user(User user);
 }

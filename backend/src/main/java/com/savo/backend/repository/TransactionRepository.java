@@ -45,4 +45,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     List<Transaction> findRecentTransactions(@Param("userId") String userId, @Param("limit") int limit);
 
     long countByUserId(String userId);
+
+    @Query("SELECT COUNT(t) FROM Transaction t WHERE t.bankAccount.id = :bankAccountId " +
+            "AND t.transactionDate BETWEEN :startDate AND :endDate")
+    long countByBankAccountIdAndDateRange(
+            @Param("bankAccountId") String bankAccountId,
+            @Param("startDate") LocalDate StartDate,
+            @Param("endDate") LocalDate EndDate);
 }

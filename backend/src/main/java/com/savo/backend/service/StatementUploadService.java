@@ -9,6 +9,7 @@ import com.savo.backend.model.StatementUpload;
 import com.savo.backend.model.User;
 import com.savo.backend.repository.BankAccountRepository;
 import com.savo.backend.repository.StatementUploadRepository;
+import com.savo.backend.repository.TransactionRepository;
 import com.savo.backend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -28,12 +30,14 @@ public class StatementUploadService {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
     private final BankAccountRepository bankAccountRepository;
+    private final TransactionRepository transactionRepository;
 
-    public StatementUploadService(StatementUploadRepository statementUploadRepository, UserRepository userRepository, FileStorageService fileStorageService, BankAccountRepository bankAccountRepository) {
+    public StatementUploadService(StatementUploadRepository statementUploadRepository, UserRepository userRepository, FileStorageService fileStorageService, BankAccountRepository bankAccountRepository, TransactionRepository transactionRepository) {
         this.statementUploadRepository = statementUploadRepository;
         this.userRepository = userRepository;
         this.fileStorageService = fileStorageService;
         this.bankAccountRepository = bankAccountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     public StatementUploadResponseDTO processStatementUpload(MultipartFile file, String userId, String bankAccountId) {
@@ -44,7 +48,8 @@ public class StatementUploadService {
         BankAccount bankAccount = bankAccountRepository.findByUserIdAndId(userId, bankAccountId)
                 .orElseThrow(() -> new ValidationException("Bank account not found"));
 
-        //validateNoDuplicateUpload(file, bankAccount);
+        // TODO: Prevent user from uploading duplicate bank statements from same bank account
+        validateNoDuplicateUpload(file, bankAccount);
 
         String s3Key = fileStorageService.uploadFile(file, userId, "statements");
 
