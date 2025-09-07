@@ -2,6 +2,7 @@ package com.savo.backend.service;
 
 import com.savo.backend.dto.statementupload.StatementUploadRequestDTO;
 import com.savo.backend.dto.statementupload.StatementUploadResponseDTO;
+import com.savo.backend.dto.statementupload.TransactionSample;
 import com.savo.backend.enums.UploadStatus;
 import com.savo.backend.exception.ValidationException;
 import com.savo.backend.model.BankAccount;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -109,7 +111,6 @@ public class StatementUploadService {
         }
     }
 
-    // TODO: Check each bank patterns matches
     private LocalDate[] extractStatementPeriod(MultipartFile file, String bankAccountName) throws IOException {
         String pdfText = extractPDFText(file, 2);
 
