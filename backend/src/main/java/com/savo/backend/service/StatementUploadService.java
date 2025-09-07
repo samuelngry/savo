@@ -67,4 +67,40 @@ public class StatementUploadService {
         StatementUpload savedUpload = statementUploadRepository.save(upload);
         return StatementUploadResponseDTO.from(savedUpload);
     }
+
+    private void validateNoDuplicateUpload(MultipartFile file, BankAccount bankAccount) {
+        try {
+            LocalDate[] period = extractStatementPeriod(file, bankAccount.getBankName());
+
+            if (period != null && period.length == 2) {
+                LocalDate startDate = period[0];
+                LocalDate endDate = period[1];
+
+                long existingTransactionCount = transactionRepository
+                        .countByBankAccountIdAndDateRange(bankAccount.getId(), startDate, endDate);
+
+                if (existingTransactionCount > 0) {
+                    List<TransactionSample> sampleTransactions = extractSampleTransactions(file, 5);
+                    boolean hasDuplicateTransactions = checkForDuplicateTransactions(sampleTransactions, bankAccount.getId());
+
+                    if (hasDuplicateTransactions) {
+                        throw new ValidationException(String.format(
+                                "Statement for period %s to %s contains transactions that already exist",
+                                startDate, endDate));
+                    }
+
+                    logger.warn("Period overlap detected but transaction differ: bankAccount={}, period={}-{}",
+                            bankAccount.getId(), startDate, endDate);
+                }
+            }
+
+            validateBasicFileDuplicate(file, bankAccount);
+
+        } catch (ValidationException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("Failed to perform deep duplicate validation: {}", e.getMessage(), e);
+            validateBasicFileDuplicate(file, bankAccount);
+        }
+    }
 }
