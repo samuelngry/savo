@@ -141,11 +141,16 @@ public class StatementUploadService {
 
             if (matcher.find()) {
                 try {
+                    if (bankAccountName.equalsIgnoreCase("DBS")) {
+                        LocalDate endDate = LocalDate.parse(matcher.group(1).trim(), dateFormatter);
+                        LocalDate startDate = endDate.withDayOfMonth(1);
+                        return new LocalDate[]{startDate, endDate};
+                    }
                     LocalDate startDate = LocalDate.parse(matcher.group(1).trim(), dateFormatter);
                     LocalDate endDate = LocalDate.parse(matcher.group(2).trim(), dateFormatter);
                     return new LocalDate[]{startDate, endDate};
                 } catch (Exception e) {
-                    logger.warn("Failed to parse dates: {} to {}", matcher.group(1), matcher.group(2));
+                    logger.warn("Failed to parse dates for bank {}: {}", bankAccountName, e.getMessage());
                 }
             }
         }
