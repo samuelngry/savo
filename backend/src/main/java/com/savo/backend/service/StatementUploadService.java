@@ -19,9 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -87,7 +89,7 @@ public class StatementUploadService {
                         .countByBankAccountIdAndDateRange(bankAccount.getId(), startDate, endDate);
 
                 if (existingTransactionCount > 0) {
-                    List<TransactionSample> sampleTransactions = extractSampleTransactions(file, 5);
+                    List<TransactionSample> sampleTransactions = extractSampleTransactions(file, bankAccount.getBankName(), 5);
                     boolean hasDuplicateTransactions = checkForDuplicateTransactions(sampleTransactions, bankAccount.getId());
 
                     if (hasDuplicateTransactions) {
@@ -157,5 +159,57 @@ public class StatementUploadService {
         }
 
         return null;
+    }
+
+    // TODO: Get a few transactions from PDF to compare
+    private List<TransactionSample> extractSampleTransactions(MultipartFile file, String bankAccountName, int sampleSize) throws IOException {
+        String pdfText = extractPDFText(file, -1); // Read full document
+        List<TransactionSample> samples = new ArrayList<>();
+        int count = 0;
+
+        switch (bankAccountName.toUpperCase()) {
+            // "01 Jul McDonald's 15.50"
+            // TODO: Write correct transaction pattern and find year of transactions
+            case "DBS":
+                int year = LocalDate.now().getYear(); // Fallback
+                Pattern yearPattern = Pattern.compile("as at (\\d{1,2}\\s+\\w{3}\\s+\\d{4})", Pattern.CASE_INSENSITIVE);
+                Matcher yearMatcher = yearPattern.matcher(pdfText);
+                if (yearMatcher.find()) {
+                    try {
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
+                        LocalDate parsedDate = LocalDate.parse(yearMatcher.group(1).trim(), formatter);
+                        year = parsedDate.getYear();
+                    } catch (Exception e) {
+                        logger.warn("Failed to parse year: {}", yearMatcher.group(1));
+                    }
+                }
+
+                Pattern transactionPattern = Pattern.compile(
+                        "(\\d{2}\\s+\\w{3})\\s+(.+?)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)",
+                        Pattern.CASE_INSENSITIVE);
+
+                Matcher matcher = transactionPattern.matcher(pdfText);
+
+                while (matcher.find() && count < sampleSize) {
+                    try {
+                        // Format 01 Jul 2025"
+                        String fullDateStr = matcher.group(1) + " " + year;
+                        LocalDate date = LocalDate.parse(fullDateStr, DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH));
+                        String description = matcher.group(2).trim();
+
+                        BigDecimal withdrawal = matcher.group(3).equals("-") ? null : new BigDecimal(matcher.group(3).replace(",",""));
+                        BigDecimal deposit = matcher.group(4).equals("-") ? null : new BigDecimal(matcher.group(4).replace(",", ""));
+
+                        BigDecimal amount = (withdrawal != null) ? withdrawal.negate() : (deposit != null) ? deposit : BigDecimal.ZERO;
+
+                        samples.add(new TransactionSample(date, description, amount));
+                        count++;
+                    } catch (Exception e) {
+                        logger.warn("Failed to parse DBS transaction line: {}", matcher.group(0));
+                    }
+                }
+
+                break;
+        }
     }
 }
