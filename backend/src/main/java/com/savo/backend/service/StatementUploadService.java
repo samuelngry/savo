@@ -214,4 +214,17 @@ public class StatementUploadService {
         }
         return false;
     }
+
+    // Fallback validation
+    private void validateBasicFileDuplicate(MultipartFile file, BankAccount bankAccount) {
+        String fileName = file.getOriginalFilename();
+        long fileSize = file.getSize();
+
+        boolean basicDuplicate = statementUploadRepository
+                .existsByBankAccountIdAndFileNameAndFileSize(bankAccount.getId(), fileName, fileSize);
+
+        if (basicDuplicate) {
+            throw new ValidationException("A file with the same name and size has already been uploaded");
+        }
+    }
 }

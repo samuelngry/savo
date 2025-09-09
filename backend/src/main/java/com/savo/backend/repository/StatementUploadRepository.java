@@ -30,6 +30,8 @@ public interface StatementUploadRepository extends JpaRepository<StatementUpload
     // Check if duplicate upload exists
     boolean existsByUserIdAndBankAccountIdAndFileNameAndCreatedAtAfter(String userId, String bankAccountId, String fileName, LocalDateTime after);
 
+    boolean existsByBankAccountIdAndFileNameAndFileSize(String bankAccountId, String fileName, long fileSize);
+
     // Find processing statements
     @Query("SELECT su FROM StatementUpload su WHERE su.uploadStatus = 'PROCESSING' AND su.processingStartedAt < :cutoffTime")
     List<StatementUpload> findStuckProcessingUploads(@Param("cutoffTime") LocalDateTime cutoffTime);
