@@ -62,18 +62,9 @@ public class StatementUploadService {
 
         String s3Key = fileStorageService.uploadFile(file, userId, "statements");
 
-        StatementUpload upload = new StatementUpload();
-        upload.setId(userId);
-        upload.setUser(user);
-        upload.setBankAccount(bankAccount);
-        upload.setFileName(file.getOriginalFilename());
-        upload.setFileSize(file.getSize());
-        upload.setS3Key(s3Key);
-        upload.setUploadStatus(UploadStatus.PROCESSING);
-        upload.setProcessingStartedAt(LocalDateTime.now());
-        upload.setCreatedAt(LocalDateTime.now());
-
+        StatementUpload upload = createStatementUpload(file, user, bankAccount, s3Key);
         StatementUpload savedUpload = statementUploadRepository.save(upload);
+
         return StatementUploadResponseDTO.from(savedUpload);
     }
 
@@ -226,5 +217,29 @@ public class StatementUploadService {
         if (basicDuplicate) {
             throw new ValidationException("A file with the same name and size has already been uploaded");
         }
+    }
+
+    private StatementUpload createStatementUpload(MultipartFile file, User user, BankAccount bankAccount, String s3Key) {
+        StatementUpload upload = new StatementUpload();
+        upload.setUser(user);
+        upload.setBankAccount(bankAccount);
+        upload.setFileName(file.getOriginalFilename());
+        upload.setFileSize(file.getSize());
+        upload.setS3Key(s3Key);
+        upload.setUploadStatus(UploadStatus.PROCESSING);
+        upload.setProcessingStartedAt(LocalDateTime.now());
+        upload.setCreatedAt(LocalDateTime.now());
+
+        try {
+            LocalDate[] period = extractStatementPeriod(file, bankAccount.getBankName());
+            if (period != null && period.length == 2) {
+                upload.setStatementPeriodStart(period[0]);
+                upload.setStatementPeriodEnd(period[1]);
+            }
+        } catch (Exception e) {
+            logger.warn("Could not extract statement period during upload creation", e);
+        }
+
+        return upload;
     }
 }
