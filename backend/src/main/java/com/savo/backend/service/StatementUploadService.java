@@ -168,39 +168,28 @@ public class StatementUploadService {
         int count = 0;
 
         switch (bankAccountName.toUpperCase()) {
-            // "01 Jul McDonald's 15.50"
             // TODO: Write correct transaction pattern and find year of transactions
             case "DBS":
                 int year = LocalDate.now().getYear(); // Fallback
-                Pattern yearPattern = Pattern.compile("as at (\\d{1,2}\\s+\\w{3}\\s+\\d{4})", Pattern.CASE_INSENSITIVE);
-                Matcher yearMatcher = yearPattern.matcher(pdfText);
-                if (yearMatcher.find()) {
-                    try {
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
-                        LocalDate parsedDate = LocalDate.parse(yearMatcher.group(1).trim(), formatter);
-                        year = parsedDate.getYear();
-                    } catch (Exception e) {
-                        logger.warn("Failed to parse year: {}", yearMatcher.group(1));
-                    }
-                }
 
                 Pattern transactionPattern = Pattern.compile(
-                        "(\\d{2}\\s+\\w{3})\\s+(.+?)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)",
+                        "(\\d{2}/\\d{2}\\d{4})\\s+(.+?)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)",
                         Pattern.CASE_INSENSITIVE);
 
                 Matcher matcher = transactionPattern.matcher(pdfText);
 
                 while (matcher.find() && count < sampleSize) {
                     try {
-                        // Format 01 Jul 2025"
-                        String fullDateStr = matcher.group(1) + " " + year;
-                        LocalDate date = LocalDate.parse(fullDateStr, DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH));
+                        // "Date: 01/08/2025"
+                        String fullDateStr = matcher.group(1);
+                        LocalDate date = LocalDate.parse(fullDateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
                         String description = matcher.group(2).trim();
 
-                        BigDecimal withdrawal = matcher.group(3).equals("-") ? null : new BigDecimal(matcher.group(3).replace(",",""));
-                        BigDecimal deposit = matcher.group(4).equals("-") ? null : new BigDecimal(matcher.group(4).replace(",", ""));
+                        BigDecimal debit = matcher.group(3).equals("-") ? null : new BigDecimal(matcher.group(3).replace(",",""));
+                        BigDecimal credit = matcher.group(4).equals("-") ? null : new BigDecimal(matcher.group(4).replace(",", ""));
 
-                        BigDecimal amount = (withdrawal != null) ? withdrawal.negate() : (deposit != null) ? deposit : BigDecimal.ZERO;
+                        BigDecimal amount = (debit != null) ? debit.negate() : (credit != null) ? credit : BigDecimal.ZERO;
 
                         samples.add(new TransactionSample(date, description, amount));
                         count++;
