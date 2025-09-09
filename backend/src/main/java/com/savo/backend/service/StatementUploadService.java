@@ -14,6 +14,7 @@ import com.savo.backend.repository.TransactionRepository;
 import com.savo.backend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,6 +65,9 @@ public class StatementUploadService {
 
         StatementUpload upload = createStatementUpload(file, user, bankAccount, s3Key);
         StatementUpload savedUpload = statementUploadRepository.save(upload);
+
+        // Start background processing
+        processStatementAsync(savedUpload.getId());
 
         return StatementUploadResponseDTO.from(savedUpload);
     }
@@ -241,5 +245,27 @@ public class StatementUploadService {
         }
 
         return upload;
+    }
+
+    @Async
+    public void processStatementAsync(String uploadId) {
+        try {
+            StatementUpload upload = statementUploadRepository.findById(uploadId)
+                    .orElseThrow(() -> new ValidationException("Upload not found"));
+
+            logger.info("Starting statement processing for upload: {}", uploadId);
+
+            // TODO: Add actual PDF parsing and transaction extraction here
+            // statementParserService.parseAndSaveTransactions(upload);
+
+            upload.setUploadStatus(UploadStatus.COMPLETED);
+            upload.setProcessingCompletedAt(LocalDateTime.now());
+            statementUploadRepository.save(upload);
+
+            logger.info("Finished statement processing for upload: {}", uploadId);
+        } catch (Exception e) {
+            logger.error("Statement processing failed for upload: {}", uploadId, e);
+            updateUploadStatus(uploadId, UploadStatus.FAILED, e.getMessage());
+        }
     }
 }

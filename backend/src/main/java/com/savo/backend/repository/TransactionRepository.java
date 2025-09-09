@@ -26,8 +26,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     List<Transaction> findByUserIdAndTransactionTypeOrderByTransactionDateDesc(String userId, TransactionType transactionType);
     List<Transaction> findByUserIdAndCategoryIdOrderByTransactionDateDesc(String userId, String categoryId);
 
-    // Analytics
-
     // Total spending/income for user
     @Query("SELECT SUM(t.amount) FROM Transaction t WHERE t.user.id = :userId AND t.transactionType = :type")
     BigDecimal sumAmountByUserIdAndTransactionType(@Param("userId") String userId, @Param("type") TransactionType type);
