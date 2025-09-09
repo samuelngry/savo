@@ -268,4 +268,13 @@ public class StatementUploadService {
             updateUploadStatus(uploadId, UploadStatus.FAILED, e.getMessage());
         }
     }
+
+    private void updateUploadStatus(String uploadId, UploadStatus status, String errorMessage) {
+        statementUploadRepository.findById(uploadId).ifPresent(upload -> {
+            upload.setUploadStatus(status);
+            upload.setErrorMessage(errorMessage);
+            upload.setProcessingCompletedAt(LocalDateTime.now());
+            statementUploadRepository.save(upload);
+        });
+    }
 }
