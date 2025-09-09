@@ -52,4 +52,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
             @Param("bankAccountId") String bankAccountId,
             @Param("startDate") LocalDate StartDate,
             @Param("endDate") LocalDate EndDate);
+
+    @Query("SELECT COUNT(t) > 0 FROM Transaction t WHERE t.bankAccount.id = :bankAccountId " +
+            "AND t.transactionDate = :date AND t.description = :description AND t.amount = :amount")
+    boolean existsByBankAccountIdAndDateAndDescriptionAndAmount(
+            @Param("bankAccountId") String bankAccountId,
+            @Param("date") LocalDate date,
+            @Param("description") String description,
+            @Param("amount") BigDecimal amount);
 }

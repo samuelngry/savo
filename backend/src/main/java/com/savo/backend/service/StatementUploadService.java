@@ -170,8 +170,6 @@ public class StatementUploadService {
         switch (bankAccountName.toUpperCase()) {
             // TODO: Write correct transaction pattern and find year of transactions
             case "DBS":
-                int year = LocalDate.now().getYear(); // Fallback
-
                 Pattern transactionPattern = Pattern.compile(
                         "(\\d{2}/\\d{2}\\d{4})\\s+(.+?)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)",
                         Pattern.CASE_INSENSITIVE);
@@ -200,5 +198,20 @@ public class StatementUploadService {
 
                 break;
         }
+
+        return samples;
+    }
+
+    private boolean checkForDuplicateTransactions(List<TransactionSample> samples, String bankAccountId) {
+        for (TransactionSample sample : samples) {
+            boolean exists = transactionRepository.existsByBankAccountIdAndDateAndDescriptionAndAmount(
+                    bankAccountId, sample.getDate(), sample.getDescription(), sample.getAmount());
+
+            if (exists) {
+                logger.info("Found duplicate transaction: date={}, description={}, amount={}", sample.getDate(), sample.getDescription(), sample.getAmount());
+                return true;
+            }
+        }
+        return false;
     }
 }
