@@ -12,6 +12,8 @@ import com.savo.backend.repository.BankAccountRepository;
 import com.savo.backend.repository.StatementUploadRepository;
 import com.savo.backend.repository.TransactionRepository;
 import com.savo.backend.repository.UserRepository;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -276,5 +278,17 @@ public class StatementUploadService {
             upload.setProcessingCompletedAt(LocalDateTime.now());
             statementUploadRepository.save(upload);
         });
+    }
+
+    private String extractPDFText(MultipartFile file, int maxPages) throws IOException {
+        try (PDDocument document = PDDocument.load(file.getInputStream())) {
+            PDFTextStripper stripper = new PDFTextStripper();
+
+            if (maxPages > 0) {
+                stripper.setEndPage(Math.min(maxPages, document.getNumberOfPages()));
+            }
+
+            return stripper.getText(document);
+        }
     }
 }
