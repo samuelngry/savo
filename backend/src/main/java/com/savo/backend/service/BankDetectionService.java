@@ -56,6 +56,37 @@ public class BankDetectionService {
         }
     }
 
+    private BankDetectionResult detectBankFromPDF(String pdfText) throws IOException {
+        BankDetectionResult result = new BankDetectionResult();
+
+        if (pdfText.contains("DBS") || pdfText.contains("POSB")) {
+            result.bankName = "DBS";
+            result.accountNumber = extractAccountNumber(pdfText, "DBS");
+        } else if (pdfText.contains("OCBC")) {
+            result.bankName = "OCBC";
+            result.accountNumber = extractAccountNumber(pdfText, "OCBC");
+        } else if (pdfText.contains("UOB")) {
+            result.bankName = "UOB";
+            result.accountNumber = extractAccountNumber(pdfText, "UOB");
+        } else {
+            throw new ValidationException("Unsupported bank format. Currently supports DBS, OCBC and UOB");
+        }
+
+        // Detect account type
+        if (pdfText.toLowerCase().contains("savings")) {
+            result.accountType = "Savings";
+        } else if (pdfText.toLowerCase().contains("current")) {
+            result.accountType = "Current";
+        } else if (pdfText.toLowerCase().contains("credit")) {
+            result.accountType = "Credit Card";
+        } else {
+            result.accountType = "Savings"; // Default
+        }
+
+        result.maskedAccountNumber = maskAccountNumber(result.accountNumber);
+        return result;
+    }
+
     private static class BankDetectionResult {
         String bankName;
         String accountType;
