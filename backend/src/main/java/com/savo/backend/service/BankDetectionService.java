@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class BankDetectionService {
@@ -85,6 +87,40 @@ public class BankDetectionService {
 
         result.maskedAccountNumber = maskAccountNumber(result.accountNumber);
         return result;
+    }
+
+    private String extractAccountNumber(String pdfText, String bankName) {
+        Pattern pattern = null;
+        Matcher matcher = null;
+
+        switch (bankName) {
+            case "DBS":
+                pattern = Pattern.compile("\\b\\d{3}-\\d{5,6}-\\d{1}\\b");
+                matcher = pattern.matcher(pdfText);
+                if (matcher.find()) {
+                    return matcher.group(0).replaceAll("-", "");
+                }
+                return "UNKNOWN";
+
+            case "OCBC":
+                pattern = Pattern.compile("Account No\\.?\\s*(\\d{10,12})", Pattern.CASE_INSENSITIVE);
+                matcher = pattern.matcher(pdfText);
+                if (matcher.find()) {
+                    return matcher.group(1);
+                }
+                return "UNKNOWN";
+
+            case "UOB":
+                pattern = Pattern.compile("Account Number:?\\s*(\\d{10,12})", Pattern.CASE_INSENSITIVE);
+                matcher = pattern.matcher(pdfText);
+                if (matcher.find()) {
+                    return matcher.group(1);
+                }
+                return "UNKNOWN";
+
+            default:
+                return "UNKNOWN";
+        }
     }
 
     private static class BankDetectionResult {
