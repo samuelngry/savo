@@ -60,7 +60,6 @@ public class StatementUploadService {
         BankAccount bankAccount = bankAccountRepository.findByUserIdAndId(userId, bankAccountId)
                 .orElseThrow(() -> new ValidationException("Bank account not found"));
 
-        // TODO: Prevent user from uploading duplicate bank statements from same bank account
         validateNoDuplicateUpload(file, bankAccount);
 
         String s3Key = fileStorageService.uploadFile(file, userId, "statements");
@@ -158,7 +157,6 @@ public class StatementUploadService {
         return null;
     }
 
-    // TODO: Get a few transactions from PDF to compare
     private List<TransactionSample> extractSampleTransactions(MultipartFile file, String bankAccountName, int sampleSize) throws IOException {
         String pdfText = extractPDFText(file, -1); // Read full document
         List<TransactionSample> samples = new ArrayList<>();
@@ -179,7 +177,7 @@ public class StatementUploadService {
                         String fullDateStr = matcher.group(1);
                         LocalDate date = LocalDate.parse(fullDateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-                        String description = matcher.group(2).trim();
+                        String description = matcher.group(2);
 
                         BigDecimal debit = matcher.group(3).equals("-") ? null : new BigDecimal(matcher.group(3).replace(",",""));
                         BigDecimal credit = matcher.group(4).equals("-") ? null : new BigDecimal(matcher.group(4).replace(",", ""));
@@ -193,6 +191,45 @@ public class StatementUploadService {
                     }
                 }
 
+                break;
+
+            case "OCBC":
+                int currentYear = LocalDate.now().getYear(); // fallback
+
+                try {
+                    Pattern periodPattern = Pattern.compile("(\\d{1,2}\\s+\\w{3}\\s+(\\d{4}))\\s+TO\\s+(\\d{1,2}\\s+\\w{3}\\s+(\\d{4}))", Pattern.CASE_INSENSITIVE);
+                    Matcher periodMatcher = periodPattern.matcher(pdfText);
+                    if (periodMatcher.find()) {
+                        currentYear = Integer.parseInt(periodMatcher.group(2)); // Start year
+                    }
+                } catch (Exception e) {
+                    logger.warn("Failed to extract statement year for OCBC, defaulting to current year");
+                }
+
+                Pattern ocbcPattern = Pattern.compile(
+                        "(\\d{2}\\s+\\w{3})\\s+\\d{2}\\s+\\w{3}\\s+(.+?)\\s+\\S+\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)",
+                        Pattern.CASE_INSENSITIVE);
+
+                Matcher ocbcMatcher = ocbcPattern.matcher(pdfText);
+
+                while (ocbcMatcher.find() && count < sampleSize) {
+                    try {
+                        String dateStr = ocbcMatcher.group(1) + " " + currentYear;
+                        LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH));
+
+                        String description = ocbcMatcher.group(2);
+
+                        BigDecimal withdrawal = ocbcMatcher.group(3).equals("-") ? null : new BigDecimal(ocbcMatcher.group(3).replace(",", ""));
+                        BigDecimal deposit = ocbcMatcher.group(4).equals("-") ? null : new BigDecimal(ocbcMatcher.group(4).replace(",", ""));
+
+                        BigDecimal amount = (withdrawal != null) ? withdrawal.negate() : (deposit != null) ? deposit : BigDecimal.ZERO;
+
+                        samples.add(new TransactionSample(date, description, amount));
+                        count++;
+                    } catch (Exception e) {
+                        logger.warn("Failed to parse OCBC transaction line: {}", ocbcMatcher.group(0));
+                    }
+                }
                 break;
         }
 
