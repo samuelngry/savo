@@ -4,6 +4,8 @@ import com.savo.backend.exception.ValidationException;
 import com.savo.backend.model.BankAccount;
 import com.savo.backend.repository.BankAccountRepository;
 import com.savo.backend.repository.UserRepository;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,15 @@ public class BankDetectionService {
         } catch (IOException e) {
             logger.error("Failed to process PDF for bank detection", e);
             throw new ValidationException("Unable to read PDF for bank detection");
+        }
+    }
+
+    private String extractTextFromPDF(MultipartFile file) throws IOException {
+        try (PDDocument document = PDDocument.load(file.getInputStream())) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            stripper.setStartPage(1);
+            stripper.setEndPage(1);
+            return stripper.getText(document);
         }
     }
 
