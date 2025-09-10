@@ -2,6 +2,7 @@ package com.savo.backend.service;
 
 import com.savo.backend.exception.ValidationException;
 import com.savo.backend.model.BankAccount;
+import com.savo.backend.model.User;
 import com.savo.backend.repository.BankAccountRepository;
 import com.savo.backend.repository.UserRepository;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -130,6 +132,25 @@ public class BankDetectionService {
 
         int length = accountNumber.length();
         return "****" + accountNumber.substring(length - 4);
+    }
+
+    private BankAccount createNewBankAccount(String userId, BankDetectionResult detection) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ValidationException("User not found"));
+
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.setUser(user);
+        bankAccount.setBankName(detection.bankName);
+        bankAccount.setAccountType(detection.accountType);
+        bankAccount.setAccountNumberMasked(detection.maskedAccountNumber);
+        bankAccount.setAccountNickname(detection.bankName + " " + detection.accountType);
+        bankAccount.setActive(true);
+        bankAccount.setCreatedAt(LocalDateTime.now());
+
+        BankAccount saved = bankAccountRepository.save(bankAccount);
+        logger.info("Created new bank account: bank={}, type={}, account={}", detection.bankName, detection.accountType, detection.maskedAccountNumber);
+
+        return saved;
     }
 
     private static class BankDetectionResult {
