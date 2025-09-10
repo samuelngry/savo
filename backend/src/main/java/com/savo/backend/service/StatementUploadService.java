@@ -231,6 +231,38 @@ public class StatementUploadService {
                     }
                 }
                 break;
+
+            case "UOB":
+                Pattern uobPattern = Pattern.compile(
+                        "(\\d{2}/\\d{2}/\\d{4})\\s+" +
+                                "(\\d{2}/\\d{2}/\\d{4})\\s+" +
+                                "(\\d{2}/\\d{2}/\\d{4}\\s+d{2}:\\d{2}:\\d{2}\\s+[AP]M)\\s+" +
+                                "(.+?)\\s+" +
+                                "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})\\s+" +
+                                "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})\\s+" +
+                                "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})"
+                );
+                Matcher uobMatcher = uobPattern.matcher(pdfText);
+
+                while (uobMatcher.find() && count < sampleSize) {
+                    try {
+                        String dateStr = uobMatcher.group(1);
+                        LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.ENGLISH));
+
+                        String description = uobMatcher.group(4);
+
+                        BigDecimal deposit = uobMatcher.group(5).equals("-") ? null : new BigDecimal(uobMatcher.group(5).replace(",", ""));
+                        BigDecimal withdrawal = uobMatcher.group(6).equals("-") ? null : new BigDecimal(uobMatcher.group(6).replace(",", ""));
+
+                        BigDecimal amount = (withdrawal != null) ? withdrawal.negate() : (deposit != null) ? deposit : BigDecimal.ZERO;
+
+                        samples.add(new TransactionSample(date, description, amount));
+                        count++;
+                    } catch (Exception e) {
+                        logger.warn("Failed to parse UOB transaction line: {}", uobMatcher.group(0));
+                    }
+                }
+                break;
         }
 
         return samples;
