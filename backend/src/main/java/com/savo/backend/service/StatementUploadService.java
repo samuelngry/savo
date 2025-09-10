@@ -43,22 +43,25 @@ public class StatementUploadService {
     private final FileStorageService fileStorageService;
     private final BankAccountRepository bankAccountRepository;
     private final TransactionRepository transactionRepository;
+    private final BankAccountService bankAccountService;
+    private final BankDetectionService bankDetectionService;
 
-    public StatementUploadService(StatementUploadRepository statementUploadRepository, UserRepository userRepository, FileStorageService fileStorageService, BankAccountRepository bankAccountRepository, TransactionRepository transactionRepository) {
+    public StatementUploadService(StatementUploadRepository statementUploadRepository, UserRepository userRepository, FileStorageService fileStorageService, BankAccountRepository bankAccountRepository, TransactionRepository transactionRepository, BankAccountService bankAccountService, BankDetectionService bankDetectionService) {
         this.statementUploadRepository = statementUploadRepository;
         this.userRepository = userRepository;
         this.fileStorageService = fileStorageService;
         this.bankAccountRepository = bankAccountRepository;
         this.transactionRepository = transactionRepository;
+        this.bankAccountService = bankAccountService;
+        this.bankDetectionService = bankDetectionService;
     }
 
-    public StatementUploadResponseDTO processStatementUpload(MultipartFile file, String userId, String bankAccountId) {
+    public StatementUploadResponseDTO processStatementUpload(MultipartFile file, String userId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ValidationException("User not found"));
 
-        BankAccount bankAccount = bankAccountRepository.findByUserIdAndId(userId, bankAccountId)
-                .orElseThrow(() -> new ValidationException("Bank account not found"));
+        BankAccount bankAccount = bankDetectionService.detectAndResolveBankAccount(file, userId);
 
         validateNoDuplicateUpload(file, bankAccount);
 

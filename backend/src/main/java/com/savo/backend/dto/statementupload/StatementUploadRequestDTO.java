@@ -6,16 +6,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class StatementUploadRequestDTO {
 
-    @NotNull(message = "Bank account ID is required")
-    private String bankAccountId;
-
     @NotNull(message = "File is required")
     private MultipartFile file;
 
     public StatementUploadRequestDTO() {}
 
     public StatementUploadRequestDTO(String bankAccountId, MultipartFile file) {
-        this.bankAccountId = bankAccountId;
         this.file = file;
     }
 
@@ -29,14 +25,6 @@ public class StatementUploadRequestDTO {
 
     public boolean isValidFileSize(long maxSizeBytes) {
         return file != null && file.getSize() <= maxSizeBytes;
-    }
-
-    public String getBankAccountId() {
-        return bankAccountId;
-    }
-
-    public void setBankAccountId(String bankAccountId) {
-        this.bankAccountId = bankAccountId;
     }
 
     public MultipartFile getFile() {
