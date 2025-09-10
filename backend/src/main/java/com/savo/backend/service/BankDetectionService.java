@@ -123,6 +123,15 @@ public class BankDetectionService {
         }
     }
 
+    private String maskAccountNumber(String accountNumber) {
+        if (accountNumber == null || accountNumber.equals("UNKNOWN") || accountNumber.length() < 4) {
+            return "****";
+        }
+
+        int length = accountNumber.length();
+        return "****" + accountNumber.substring(length - 4);
+    }
+
     private static class BankDetectionResult {
         String bankName;
         String accountType;
