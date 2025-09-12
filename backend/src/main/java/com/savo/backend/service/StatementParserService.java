@@ -49,4 +49,17 @@ public class StatementParserService {
             throw new RuntimeException("Failed to parse transactions for upload: " + upload.getId(), e);
         }
     }
+
+    private List<Transaction> parseTransactionsByBank(String pdfText, String bankName, StatementUpload upload) {
+        switch (bankName.toUpperCase()) {
+            case "DBS":
+                return parseDBSTransactions(pdfText, upload);
+            case "OCBC":
+                return parseOCBCTransactions(pdfText, upload);
+            case "UOB":
+                return parseUOBTransactions(pdfText, upload);
+            default:
+                throw new IllegalArgumentException("Unsupported bank: " + bankName);
+        }
+    }
 }
