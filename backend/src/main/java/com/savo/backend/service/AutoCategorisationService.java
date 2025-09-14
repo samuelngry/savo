@@ -1,5 +1,6 @@
 package com.savo.backend.service;
 
+import com.savo.backend.model.Category;
 import com.savo.backend.model.Transaction;
 import com.savo.backend.repository.CategoryRepository;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -113,17 +115,17 @@ public class AutoCategorisationService {
         if (transaction.getTransactionType().toString().equals("Credit")) {
             for (String keyword : CATEGORY_KEYWORDS.get("Salary")) {
                 if (fullText.contains(keyword)) {
-                    return findOrCreateCategory("Salary", transaction.getUser(), true);
+                    return findOrCreateCategory("Salary", transaction.getUser().getId(), true);
                 }
             }
 
             for (String keyword : CATEGORY_KEYWORDS.get("Investment")) {
                 if (fullText.contains(keyword)) {
-                    return findOrCreateCategory("Investment", transaction.getUser(), true);
+                    return findOrCreateCategory("Investment", transaction.getUser().getId(), true);
                 }
             }
 
-            return findOrCreateCategory("Other Income", transaction.getUser(), true);
+            return findOrCreateCategory("Other Income", transaction.getUser().getId(), true);
         }
 
         // Find most likely category for expense transaction
@@ -145,15 +147,15 @@ public class AutoCategorisationService {
         }
 
         if (bestCategory != null && maxScore > 0.5) {
-            return findOrCreateCategory(bestCategory, transaction.getUserId(), false);
+            return findOrCreateCategory(bestCategory, transaction.getUser().getId(), false);
         }
 
         String amountBasedCategory = categoriseByAmount(transaction.getAmount());
         if (amountBasedCategory != null) {
-            return findOrCreateCategory(amountBasedCategory, transaction.getUserId(), false);
+            return findOrCreateCategory(amountBasedCategory, transaction.getUser().getId(), false);
         }
 
-        return findOrCreateCategory("Uncategorised", transaction.getUserId(), false);
+        return findOrCreateCategory("Uncategorised", transaction.getUser().getId(), false);
     }
 
     private double calculateCategoryScore(String text, String[] keywords) {
@@ -192,5 +194,20 @@ public class AutoCategorisationService {
         }
 
         return "Bills & Utilities";
+    }
+
+    private String findOrCreateCategory(String categoryName, String userId, boolean isIncome) {
+        Optional<Category> systemCategory = categoryRepository.findByNameAndUserIdIsNull(categoryName);
+        if (systemCategory.isPresent()) {
+            return systemCategory.get().getId();
+        }
+
+        Optional<Category> userCategory = categoryRepository.findByNameAndUserId(categoryName, userId);
+        if (userCategory.isPresent()) {
+            return userCategory.get().getId();
+        }
+
+        // Create new system category
+        return createSystemCategory(categoryName, isIncome, getDefaultIcon(categoryName), getDefaultColor(categoryName));
     }
 }

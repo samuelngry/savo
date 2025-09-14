@@ -32,6 +32,10 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
 
     Optional<Category> findByUserIdAndId(String userId, String categoryId);
 
+    Optional<Category> findByNameAndUserIdIsNull(String name);
+
+    Optional<Category> findByNameAndUserId(String name, String userId);
+
     // System parent categories only
     @Query("SELECT c FROM Category c WHERE c.user IS NULL AND c.parentCategory IS NULL AND c.isActive ORDER BY c.name")
     List<Category> findSystemParentCategories();
