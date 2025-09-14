@@ -6,11 +6,16 @@ import com.savo.backend.model.StatementUpload;
 import com.savo.backend.model.Transaction;
 import com.savo.backend.repository.CategoryRepository;
 import com.savo.backend.repository.TransactionRepository;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -302,6 +307,21 @@ public class StatementParserService {
         }
 
         return currentYear;
+    }
+
+    private String extractPDFTextFromUrl(String presignedUrl) throws IOException {
+        logger.debug("Extracting PDF text from URL: {}", presignedUrl);
+
+        try (InputStream inputStream = new URL(presignedUrl).openStream();
+            PDDocument document = PDDocument.load(inputStream)) {
+
+            PDFTextStripper stripper = new PDFTextStripper();
+            return stripper.getText(document);
+
+        } catch (IOException e) {
+            logger.error("Failed to extract PDF text from presigned URL: {}", e.getMessage());
+            throw new IOException("Failed to process PDF from S3", e);
         }
     }
+}
 
