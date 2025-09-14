@@ -144,7 +144,7 @@ public class StatementParserService {
                 "(\\d{2}\\s+\\w{3})\\s+" +
                         "(\\d{2}\\s+\\w{3})\\s+" +
                         "(.+?)\\s+" +
-                        "(?:([^\\s]+)\\s+)?" +
+                        "(?:(\\S+)\\s+)?" +
                         "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})?\\s+" +
                         "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})?\\s+" +
                         "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})",
@@ -191,6 +191,68 @@ public class StatementParserService {
 
             } catch (Exception e) {
                 logger.warn("Failed to parse OCBC transaction line: '{}', error: {}", matcher.group(0), e.getMessage());
+            }
+        }
+
+        return transactions;
+    }
+
+    private List<Transaction> parseUOBTransactions(String pdfText, StatementUpload upload) {
+        List<Transaction> transactions = new ArrayList<>();
+
+        Pattern transactionPattern = Pattern.compile(
+                "(\\d{2}/\\d{2}/\\d{4})\\s+" +
+                        "(\\d{2}/\\d{2}/\\d{4})\\s+" +
+                        "(\\d{2}/\\d{2}/\\d{4}\\s+\\d{2}:\\d{2}:\\d{2}\\s+[AP]M)\\s+" +
+                        "(.+?)\\s+" +
+                        "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})\\s+" +
+                        "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})\\s+" +
+                        "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})",
+                Pattern.MULTILINE
+        );
+
+        Matcher matcher = transactionPattern.matcher(pdfText);
+
+        while (matcher.find()) {
+            try {
+                Transaction transaction = new Transaction();
+
+                String dateStr = matcher.group(1);
+                LocalDate transactionDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                transaction.setTransactionDate(transactionDate);
+
+                String description = matcher.group(4).replaceAll("\\s+", " ").trim();
+                transaction.setDescription(description);
+                transaction.setMerchantName(extractMerchantName(description, "UOB"));
+
+                String creditStr = matcher.group(5);
+                String debitStr = matcher.group(6);
+                String balanceStr = matcher.group(7);
+
+                BigDecimal amount;
+                TransactionType type;
+
+                BigDecimal credit = new BigDecimal(creditStr.replace(",", ""));
+                BigDecimal debit = new BigDecimal(debitStr.replace(",", ""));
+
+                if (debit.compareTo(BigDecimal.ZERO) > 0) {
+                    amount = debit;
+                    type = TransactionType.Debit;
+                } else if (credit.compareTo(BigDecimal.ZERO) > 0) {
+                    amount = credit;
+                    type = TransactionType.Credit;
+                } else {
+                    continue;
+                }
+
+                transaction.setAmount(amount);
+                transaction.setTransactionType(type);
+                transaction.setBalanceAfter(new BigDecimal(balanceStr.replace(",", "")));
+
+                setTransactionMetadata(transaction, upload);
+                transactions.add(transaction);
+            } catch (Exception e) {
+                logger.warn("Failed to parse UOB transaction line: '{}', error: {}", matcher.group(0), e.getMessage());
             }
         }
 
