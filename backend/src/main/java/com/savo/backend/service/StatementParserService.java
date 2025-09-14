@@ -133,7 +133,7 @@ public class StatementParserService {
                     transaction.setBalanceAfter(new BigDecimal(balanceStr.replace(",", "")));
                 }
 
-                setTransactionMetadate(transaction, upload);
+                setTransactionMetadata(transaction, upload);
 
                 transactions.add(transaction);
             } catch (Exception e) {
@@ -287,7 +287,6 @@ public class StatementParserService {
         transaction.setUpdatedAt(LocalDateTime.now());
     }
 
-    // TODO (14/9): Extract merchant name based on each specific bank
     private String extractMerchantName(String description, String bankName) {
 
         // Generic cleaning
