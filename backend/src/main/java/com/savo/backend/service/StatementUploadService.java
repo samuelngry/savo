@@ -169,7 +169,7 @@ public class StatementUploadService {
             // TODO: Write correct transaction pattern and find year of transactions
             case "DBS":
                 Pattern transactionPattern = Pattern.compile(
-                        "(\\d{2}/\\d{2}\\d{4})\\s+(.+?)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)",
+                        "(\\d{2}/\\d{2}/\\d{4})\\s+(.+?)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)",
                         Pattern.CASE_INSENSITIVE);
 
                 Matcher matcher = transactionPattern.matcher(pdfText);
