@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -75,7 +76,8 @@ public class StatementParserService {
         List<Transaction> transactions = new ArrayList<>();
 
         Pattern transactionPattern = Pattern.compile(
-                ""
+                "(\\d{2}/\\d{2}/\\d{4})\\s+(.+?)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)(?:\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}))?",
+                Pattern.MULTILINE
         );
 
         Matcher matcher = transactionPattern.matcher(pdfText);
@@ -122,6 +124,62 @@ public class StatementParserService {
                 transactions.add(transaction);
             } catch (Exception e) {
                 logger.warn("Failed to parse DBS transaction line: '{}', error: {}", matcher.group(0), e.getMessage());
+            }
+        }
+
+        return transactions;
+    }
+
+    private List<Transaction> parseOCBCTransactions(String pdfText, StatementUpload upload) {
+        List<Transaction> transactions = new ArrayList<>();
+
+        int statementYear = extractStatementYear(pdfText, "OCBC");
+
+        Pattern transactionPattern = Pattern.compile(
+                "(\\d{2}\\s+\\w{3})\\s+(\\d{2}\\s+\\w{3})\\s+(.+?)\\s+\\w+\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2})",
+                Pattern.MULTILINE
+        );
+
+        Matcher matcher = transactionPattern.matcher(pdfText);
+
+        while (matcher.find()) {
+            try {
+                Transaction transaction = new Transaction();
+
+                String dateStr = matcher.group(1) + " " + statementYear;
+                LocalDate transactionDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH));
+                transaction.setTransactionDate(transactionDate);
+
+                String description = matcher.group(3);
+                transaction.setDescription(description);
+                transaction.setMerchantName(extractMerchantName(description, "OCBC"));
+
+                String debitStr = matcher.group(5);
+                String creditStr = matcher.group(6);
+                String balanceStr = matcher.group(7);
+
+                BigDecimal amount;
+                TransactionType type;
+
+                if (debitStr != null && !debitStr.trim().isEmpty()) {
+                    amount = new BigDecimal(debitStr.replace(",", ""));
+                    type = TransactionType.Debit;
+                } else if (creditStr != null && !creditStr.trim().isEmpty()) {
+                    amount = new BigDecimal(creditStr.replace(",", ""));
+                    type = TransactionType.Credit;
+                } else {
+                    continue;
+                }
+
+                transaction.setAmount(amount);
+                transaction.setTransactionType(type);
+                transaction.setBalanceAfter(new BigDecimal(balanceStr.replace(",", "")));
+
+                setTransactionMetadata(transaction, upload);
+                transactions.add(transaction);
+
+            } catch (Exception e) {
+                logger.warn("Failed to parse OCBC transaction line: '{}', error: {}", matcher.group(0), e.getMessage());
             }
         }
 
