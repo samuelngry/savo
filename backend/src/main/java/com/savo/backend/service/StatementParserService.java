@@ -282,4 +282,26 @@ public class StatementParserService {
         transaction.setCreatedAt(LocalDateTime.now());
         transaction.setUpdatedAt(LocalDateTime.now());
     }
-}
+
+    private int extractStatementYear(String pdfText, String bankName) {
+        int currentYear = LocalDate.now().getYear();
+
+        try {
+            Pattern ocbcPattern = Pattern.compile(
+                    "\\d{1,2}\\s+\\w{3}\\s+(\\d{4})\\s+TO\\s+\\d{1,2}\\s+\\w{3}\\s+(\\d{4})",
+                    Pattern.CASE_INSENSITIVE
+            );
+            Matcher ocbcMatcher = ocbcPattern.matcher(pdfText);
+
+            if (ocbcMatcher.find()) {
+                currentYear = Integer.parseInt(ocbcMatcher.group(1));
+            }
+
+        } catch (Exception e) {
+            logger.warn("Failed to extract statement year for {}, using current year", bankName);
+        }
+
+        return currentYear;
+        }
+    }
+
