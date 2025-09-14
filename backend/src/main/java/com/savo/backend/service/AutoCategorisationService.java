@@ -154,4 +154,20 @@ public class AutoCategorisationService {
 
         return findOrCreateCategory("Uncategorised", transaction.getUserId(), false);
     }
+
+    private double calculateCategoryScore(String text, String[] keywords) {
+        int matches = 0;
+        double totalScore = 0.0;
+
+        for (String keyword : keywords) {
+            if (text.contains(keyword)) {
+                matches++;
+                // Longer keywords get higher scores (more specific)
+                totalScore += Math.min(1.0, keyword.length() / 10.0);
+            }
+        }
+
+        // Normalise score based on number of matches and keyword strength
+        return matches > 0 ? totalScore / keywords.length : 0.0;
+    }
 }
