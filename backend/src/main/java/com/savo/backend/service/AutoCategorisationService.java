@@ -1,5 +1,6 @@
 package com.savo.backend.service;
 
+import com.savo.backend.model.Transaction;
 import com.savo.backend.repository.CategoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,5 +100,29 @@ public class AutoCategorisationService {
 
     public AutoCategorisationService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
+    }
+
+    public String autoCategoriseTransaction(Transaction transaction) {
+        String description = transaction.getDescription().toUpperCase();
+        String merchantName = transaction.getMerchantName() != null ?
+                transaction.getMerchantName().toUpperCase() : null;
+
+        String fullText = (description + " " + merchantName).toUpperCase();
+
+        if (transaction.getTransactionType().toString().equals("Credit")) {
+            for (String keyword : CATEGORY_KEYWORDS.get("Salary")) {
+                if (fullText.contains(keyword)) {
+                    return findOrCreateCategory("Salary", transaction.getUser(), true);
+                }
+            }
+
+            for (String keyword : CATEGORY_KEYWORDS.get("Investment")) {
+                if (fullText.contains(keyword)) {
+                    return findOrCreateCategory("Investment", transaction.getUser(), true);
+                }
+            }
+
+            return findOrCreateCategory("Other Income", transaction.getUser(), true);
+        }
     }
 }

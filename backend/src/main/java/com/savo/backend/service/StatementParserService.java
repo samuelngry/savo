@@ -31,13 +31,13 @@ public class StatementParserService {
     private static final Logger logger = LoggerFactory.getLogger(StatementParserService.class);
 
     private final FileStorageService fileStorageService;
-    private final CategoryService categoryService;
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
+    private final AutoCategorisationService autoCategorisationService;
 
-    public StatementParserService(FileStorageService fileStorageService, CategoryService categoryService, TransactionRepository transactionRepository, CategoryRepository categoryRepository) {
+    public StatementParserService(FileStorageService fileStorageService, AutoCategorisationService autoCategorisationService, TransactionRepository transactionRepository, CategoryRepository categoryRepository) {
         this.fileStorageService = fileStorageService;
-        this.categoryService = categoryService;
+        this.autoCategorisationService = autoCategorisationService;
         this.transactionRepository = transactionRepository;
         this.categoryRepository = categoryRepository;
     }
@@ -277,7 +277,7 @@ public class StatementParserService {
         transaction.setDayOfWeek(date.getDayOfWeek().getValue());
         transaction.setWeekend(date.getDayOfWeek().getValue() >= 6);
 
-        String categoryId = categoryService.autoCategoriseTransaction(transaction);
+        String categoryId = autoCategorisationService.autoCategoriseTransaction(transaction);
         Category category = categoryRepository.findById(categoryId)
                 .orElse(null);
         transaction.setCategory(category);
