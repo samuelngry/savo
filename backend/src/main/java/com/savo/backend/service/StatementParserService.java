@@ -141,7 +141,13 @@ public class StatementParserService {
         int statementYear = extractStatementYear(pdfText, "OCBC");
 
         Pattern transactionPattern = Pattern.compile(
-                "(\\d{2}\\s+\\w{3})\\s+(\\d{2}\\s+\\w{3})\\s+(.+?)\\s+\\w+\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2})",
+                "(\\d{2}\\s+\\w{3})\\s+" +
+                        "(\\d{2}\\s+\\w{3})\\s+" +
+                        "(.+?)\\s+" +
+                        "(?:([^\\s]+)\\s+)?" +
+                        "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})?\\s+" +
+                        "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})?\\s+" +
+                        "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})",
                 Pattern.MULTILINE
         );
 
