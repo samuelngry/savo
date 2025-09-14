@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -169,5 +170,27 @@ public class AutoCategorisationService {
 
         // Normalise score based on number of matches and keyword strength
         return matches > 0 ? totalScore / keywords.length : 0.0;
+    }
+
+    private String categoriseByAmount(BigDecimal amount) {
+        BigDecimal absAmount = amount.abs();
+
+        if (absAmount.compareTo(new BigDecimal("5")) <= 0) {
+            return "Transport";
+        }
+
+        if (absAmount.compareTo(new BigDecimal("20")) <= 0) {
+            return "Food & Dining";
+        }
+
+        if (absAmount.compareTo(new BigDecimal("100")) <= 0) {
+            return "Groceries";
+        }
+
+        if (absAmount.compareTo(new BigDecimal("500")) <= 0) {
+            return "Shopping";
+        }
+
+        return "Bills & Utilities";
     }
 }
