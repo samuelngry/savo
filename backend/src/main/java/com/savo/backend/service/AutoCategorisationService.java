@@ -124,5 +124,34 @@ public class AutoCategorisationService {
 
             return findOrCreateCategory("Other Income", transaction.getUser(), true);
         }
+
+        // Find most likely category for expense transaction
+        double maxScore = 0.0;
+        String bestCategory = null;
+
+        for (Map.Entry<String, String[]> entry :CATEGORY_KEYWORDS.entrySet()) {
+            String categoryName = entry.getKey();
+
+            if (categoryName.equals("Salary") || categoryName.equals("Investment")) {
+                continue;
+            }
+
+            double score = calculateCategoryScore(fullText, entry.getValue());
+            if (score > maxScore) {
+                maxScore = score;
+                bestCategory = categoryName;
+            }
+        }
+
+        if (bestCategory != null && maxScore > 0.5) {
+            return findOrCreateCategory(bestCategory, transaction.getUserId(), false);
+        }
+
+        String amountBasedCategory = categoriseByAmount(transaction.getAmount());
+        if (amountBasedCategory != null) {
+            return findOrCreateCategory(amountBasedCategory, transaction.getUserId(), false);
+        }
+
+        return findOrCreateCategory("Uncategorised", transaction.getUserId(), false);
     }
 }
