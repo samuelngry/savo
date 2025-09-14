@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "categorization_feedback")
-public class CategorizationFeedback {
+public class CategorisationFeedback {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -36,10 +36,10 @@ public class CategorizationFeedback {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public CategorizationFeedback() {}
+    public CategorisationFeedback() {}
 
     // Constructor for manual correction
-    public CategorizationFeedback(User user, Transaction transaction,
+    public CategorisationFeedback(User user, Transaction transaction,
                                   String originalCategoryId, String correctedCategoryId,
                                   FeedbackType feedbackType) {
         this.user = user;

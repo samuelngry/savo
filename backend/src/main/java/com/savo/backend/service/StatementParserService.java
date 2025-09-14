@@ -81,7 +81,6 @@ public class StatementParserService {
         }
     }
 
-    // TODO: add each banks transaction pattern format to parse
     private List<Transaction> parseDBSTransactions(String pdfText, StatementUpload upload) {
         List<Transaction> transactions = new ArrayList<>();
 
@@ -286,6 +285,36 @@ public class StatementParserService {
 
         transaction.setCreatedAt(LocalDateTime.now());
         transaction.setUpdatedAt(LocalDateTime.now());
+    }
+
+    // TODO (14/9): Extract merchant name based on each specific bank
+    private String extractMerchantName(String description, String bankName) {
+
+        // Generic cleaning
+        String cleaned = description.replaceAll("\\b\\d{2}/\\d{2}\\b", "") // Remove dates
+                .replaceAll("\\*\\d+", "") // Remove reference numbers
+                .replaceAll("\\s+", " ")
+                .trim();
+
+        // Bank-specific cleaning rules
+        switch (bankName.toUpperCase()) {
+            case "DBS":
+                cleaned = cleaned.replaceAll("^(GIRO|NETS|FAST|PAYNOW)\\s*-?\\s*", "");
+                break;
+            case "OCBC":
+                cleaned = cleaned.replaceAll("^(TXN|REF)\\s*\\w+\\s*", "");
+                break;
+            case "UOB":
+                cleaned = cleaned.replaceAll("^(VISA|MASTERCARD)\\s*", "");
+                break;
+        }
+
+        String[] words = cleaned.split("\\s+");
+        if (words.length > 3) {
+            return String.join(" ", words[0], words[1], words[2]);
+        }
+
+        return cleaned;
     }
 
     private int extractStatementYear(String pdfText, String bankName) {
