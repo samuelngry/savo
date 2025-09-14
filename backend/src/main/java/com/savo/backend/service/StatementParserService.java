@@ -76,7 +76,12 @@ public class StatementParserService {
         List<Transaction> transactions = new ArrayList<>();
 
         Pattern transactionPattern = Pattern.compile(
-                "(\\d{2}/\\d{2}/\\d{4})\\s+(.+?)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}|-)(?:\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}))?",
+                "(\\d{2}/\\d{2}/\\d{4})\\s+" +
+                        "(.+?)\\s+" +
+                        "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})?" +
+                        "\\s+" +
+                        "(\\d{1,3}(?:,\\d{3})*\\.\\d{2})?" +
+                        "(?:\\s+(\\d{1,3}(?:,\\d{3})*\\.\\d{2}))?",
                 Pattern.MULTILINE
         );
 
