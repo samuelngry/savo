@@ -1,8 +1,10 @@
 package com.savo.backend.service;
 
 import com.savo.backend.enums.TransactionType;
+import com.savo.backend.model.Category;
 import com.savo.backend.model.StatementUpload;
 import com.savo.backend.model.Transaction;
+import com.savo.backend.repository.CategoryRepository;
 import com.savo.backend.repository.TransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +28,13 @@ public class StatementParserService {
     private final FileStorageService fileStorageService;
     private final CategoryService categoryService;
     private final TransactionRepository transactionRepository;
+    private final CategoryRepository categoryRepository;
 
-    public StatementParserService(FileStorageService fileStorageService, CategoryService categoryService, TransactionRepository transactionRepository) {
+    public StatementParserService(FileStorageService fileStorageService, CategoryService categoryService, TransactionRepository transactionRepository, CategoryRepository categoryRepository) {
         this.fileStorageService = fileStorageService;
         this.categoryService = categoryService;
         this.transactionRepository = transactionRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public void parseAndSaveTransactions(StatementUpload upload) {
@@ -257,5 +262,24 @@ public class StatementParserService {
         }
 
         return transactions;
+    }
+
+    private void setTransactionMetadata(Transaction transaction, StatementUpload upload) {
+        transaction.setUser(upload.getUser());
+        transaction.setBankAccount(upload.getBankAccount());
+        transaction.setStatementUpload(upload);
+
+        LocalDate date = transaction.getTransactionDate();
+        transaction.setDayOfWeek(date.getDayOfWeek().getValue());
+        transaction.setWeekend(date.getDayOfWeek().getValue() >= 6);
+
+        String categoryId = categoryService.autoCategoriseTransaction(transaction);
+        Category category = categoryRepository.findById(categoryId)
+                .orElse(null);
+        transaction.setCategory(category);
+        transaction.setManuallyCategorized(false);
+
+        transaction.setCreatedAt(LocalDateTime.now());
+        transaction.setUpdatedAt(LocalDateTime.now());
     }
 }
