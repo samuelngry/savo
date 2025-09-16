@@ -254,4 +254,22 @@ public class AutoCategorisationService {
             createSystemCategory(categoryName, isIncome, icon, color);
         }
     }
+
+    private String getDefaultIcon(String categoryName) {
+        Map<String, String> icons = new HashMap<String, String>() {{
+            put("Food & Dining", "🍽️");
+            put("Groceries", "🛒");
+            put("Transport", "🚗");
+            put("Shopping", "🛍️");
+            put("Bills & Utilities", "💡");
+            put("Entertainment", "🎬");
+            put("Healthcare", "🏥");
+            put("Education", "📚");
+            put("Personal Care", "💄");
+            put("Salary", "💰");
+            put("Investment", "📈");
+            put("Other Income", "💵");
+        }};
+        return icons.getOrDefault(categoryName, "❓");
+    }
 }
