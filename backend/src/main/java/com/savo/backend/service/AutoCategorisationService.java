@@ -248,4 +248,10 @@ public class AutoCategorisationService {
 
         logger.info("System categories initialized");
     }
+
+    private void createIfNotExists(String categoryName, boolean isIncome, String icon, String color) {
+        if (!categoryRepository.existsByNameAndUserIdIsNull(categoryName)) {
+            createSystemCategory(categoryName, isIncome, icon, color);
+        }
+    }
 }
