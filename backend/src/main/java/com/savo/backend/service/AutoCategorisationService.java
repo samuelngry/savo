@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -209,5 +210,20 @@ public class AutoCategorisationService {
 
         // Create new system category
         return createSystemCategory(categoryName, isIncome, getDefaultIcon(categoryName), getDefaultColor(categoryName));
+    }
+
+    @Transactional
+    private String createSystemCategory(String categoryName, boolean isIncome, String icon, String color) {
+        Category category = new Category();
+        category.setName(categoryName);
+        category.setUser(null);
+        category.setIcon(icon);
+        category.setColor(color);
+        category.setIncomeCategory(isIncome);
+        category.setActive(true);
+        category.setCreatedAt(LocalDateTime.now());
+
+        Category saved = categoryRepository.save(category);
+        return saved.getId();
     }
 }
