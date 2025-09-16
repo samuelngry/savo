@@ -104,6 +104,7 @@ public class AutoCategorisationService {
 
     public AutoCategorisationService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
+        initialiseSystemCategories();
     }
 
     public String autoCategoriseTransaction(Transaction transaction) {
@@ -225,5 +226,26 @@ public class AutoCategorisationService {
 
         Category saved = categoryRepository.save(category);
         return saved.getId();
+    }
+
+    private void initialiseSystemCategories() {
+        logger.info("Initialising system categories...");
+
+        createIfNotExists("Food & Drinks", false, "🍽️", "#FF6B6B");
+        createIfNotExists("Groceries", false, "🛒", "#4ECDC4");
+        createIfNotExists("Transport", false, "🚗", "#45B7D1");
+        createIfNotExists("Shopping", false, "🛍️", "#96CEB4");
+        createIfNotExists("Bills & Utilities", false, "💡", "#FFEAA7");
+        createIfNotExists("Entertainment", false, "🎬", "#DDA0DD");
+        createIfNotExists("Healthcare", false, "🏥", "#FF7675");
+        createIfNotExists("Education", false, "📚", "#74B9FF");
+        createIfNotExists("Personal Care", false, "💄", "#FD79A8");
+        createIfNotExists("Uncategorized", false, "❓", "#B0B0B0");
+
+        createIfNotExists("Salary", true, "💰", "#00B894");
+        createIfNotExists("Investment", true, "📈", "#6C5CE7");
+        createIfNotExists("Other Income", true, "💵", "#A29BFE");
+
+        logger.info("System categories initialized");
     }
 }
