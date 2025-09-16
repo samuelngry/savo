@@ -272,4 +272,22 @@ public class AutoCategorisationService {
         }};
         return icons.getOrDefault(categoryName, "❓");
     }
+
+    private String getDefaultColor(String categoryName) {
+        Map<String, String> colors = new HashMap<String, String>() {{
+            put("Food & Dining", "#FF6B6B");
+            put("Groceries", "#4ECDC4");
+            put("Transport", "#45B7D1");
+            put("Shopping", "#96CEB4");
+            put("Bills & Utilities", "#FFEAA7");
+            put("Entertainment", "#DDA0DD");
+            put("Healthcare", "#FF7675");
+            put("Education", "#74B9FF");
+            put("Personal Care", "#FD79A8");
+            put("Salary", "#00B894");
+            put("Investment", "#6C5CE7");
+            put("Other Income", "#A29BFE");
+        }};
+        return colors.getOrDefault(categoryName, "#B0B0B0");
+    }
 }
