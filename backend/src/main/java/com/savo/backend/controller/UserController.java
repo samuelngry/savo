@@ -69,26 +69,37 @@ public class UserController {
         }
     }
 
-    @PutMapping("{id}/profile")
-    public ResponseEntity<?> updateUserProfile(@PathVariable String id, @RequestBody Map<String, String> request) {
+    @PutMapping("/profile")
+    @Operation(
+            summary = "Update user profile",
+            description = "Update the authenticated user's profile information",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Profile updated successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
+    public ResponseEntity<?> updateUserProfile(@AuthenticationPrincipal UserDetails userDetails, @RequestBody UpdateProfileRequest request) {
         try {
-            String firstName = request.get("firstName");
-            String lastName = request.get("lastName");
-            String currency = request.get("currency");
-            String timezone = request.get("timezone");
+            String userId = userDetails.getUsername();
 
-            User updatedUser = userService.updateUserProfile(id, firstName, lastName, timezone, currency);
-
-            Map<String, Object> response = Map.of(
-                    "id", updatedUser.getId(),
-                    "email", updatedUser.getEmail(),
-                    "firstName", updatedUser.getFirstName(),
-                    "lastName", updatedUser.getLastName(),
-                    "fullName", userService.getUserFullName(updatedUser),
-                    "currency", updatedUser.getCurrency(),
-                    "timezone", updatedUser.getTimezone(),
-                    "message", "Profile updated successfully"
+            User updatedUser = userService.updateUserProfile(
+                    userId,
+                    request.getFirstName(),
+                    request.getLastName(),
+                    request.getTimezone(),
+                    request.getCurrency()
             );
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", updatedUser.getId());
+            response.put("email", updatedUser.getEmail());
+            response.put("firstName", updatedUser.getFirstName());
+            response.put("lastName", updatedUser.getLastName());
+            response.put("fullName", userService.getUserFullName(updatedUser));
+            response.put("currency", updatedUser.getCurrency());
+            response.put("timezone", updatedUser.getTimezone());
+            response.put("message", "Profile updated successfully");
 
             return ResponseEntity.ok(response);
 
@@ -142,5 +153,22 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", e.getMessage()));
         }
+    }
+
+    public static class UpdateProfileRequest {
+        private String firstName;
+        private String lastName;
+        private String currency;
+        private String timezone;
+
+        // Getters and setters
+        public String getFirstName() { return firstName; }
+        public void setFirstName(String firstName) { this.firstName = firstName; }
+        public String getLastName() { return lastName; }
+        public void setLastName(String lastName) { this.lastName = lastName; }
+        public String getCurrency() { return currency; }
+        public void setCurrency(String currency) { this.currency = currency; }
+        public String getTimezone() { return timezone; }
+        public void setTimezone(String timezone) { this.timezone = timezone; }
     }
 }
