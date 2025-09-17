@@ -154,17 +154,32 @@ public class UserController {
         }
     }
 
-    @PostMapping("{id}/verify-email")
-    public ResponseEntity<?> verifyEmail(@PathVariable String id, @RequestBody Map<String, String> request) {
+    @PostMapping("verify-email")
+    @Operation(
+            summary = "Verify user email",
+            description = "Verify the authenticated user's email address",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Email verified successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
+    public ResponseEntity<?> verifyEmail(@AuthenticationPrincipal UserDetails userDetails) {
         try {
-            User user = userService.verifyEmail(id);
+            String userId = userDetails.getUsername();
+
+            User user = userService.verifyEmail(userId);
             return ResponseEntity.ok(Map.of(
                     "message", "Email verified successfully",
                     "emailVerified", user.getEmailVerified()
             ));
+
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to verify email"));
         }
     }
 
