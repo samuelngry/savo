@@ -111,4 +111,19 @@ public class AuthController {
                     .body(Map.of("error", "Login failed: " + e.getMessage()));
         }
     }
+
+    private Map<String, Object> createUserResponse(User user) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", user.getId());
+        response.put("email", user.getEmail());
+        response.put("firstName", user.getFirstName());
+        response.put("lastName", user.getLastName() != null ? user.getLastName() : "");
+        response.put("fullName", userService.getUserFullName(user));
+        response.put("username", user.getUsername() != null ? user.getUsername() : "");
+        response.put("provider", user.getProvider());
+        response.put("emailVerified", user.getEmailVerified());
+        response.put("currency", user.getCurrency());
+        response.put("timezone", user.getTimezone());
+        return response;
+    }
 }
