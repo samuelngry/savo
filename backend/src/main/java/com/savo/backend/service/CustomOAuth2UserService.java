@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.attribute.UserPrincipal;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -47,5 +48,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         return UserPrincipal.create(user, oAuth2User.getAttributes());
+    }
+
+    private User registerNewUser(OAuth2UserInfo oAuth2UserInfo, String provider) {
+        User user = new User();
+        user.setEmail(oAuth2UserInfo.getEmail());
+        user.setFirstName(oAuth2UserInfo.getFirstName());
+        user.setLastName(oAuth2UserInfo.getLastName());
+        user.setProvider(provider.toUpperCase());
+        user.setProviderId(oAuth2UserInfo.getId());
+        user.setEmailVerified(true);
+        user.setCurrency("SGD");
+        user.setTimezone("Asia/Singapore");
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+
+        return userRepository.save(user);
     }
 }
