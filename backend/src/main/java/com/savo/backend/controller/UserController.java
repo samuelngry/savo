@@ -112,24 +112,37 @@ public class UserController {
         }
     }
 
-    @PostMapping("{id}/change-password")
-    public ResponseEntity<?> changePassword(@PathVariable String id, @RequestBody Map<String, String> request) {
+    @PostMapping("/change-password")
+    @Operation(
+            summary = "Change user password",
+            description = "Change the authenticated user's password (local accounts only)",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Password changed successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid current password or OAuth user"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    public ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ChangePasswordRequest request) {
         try {
-            String currentPassword = request.get("currentPassword");
-            String newPassword = request.get("newPassword");
+            String userId = userDetails.getUsername();
 
-            if (currentPassword == null || newPassword == null) {
+            if (request.getCurrentPassword()== null || request.getNewPassword() == null) {
                 return ResponseEntity.badRequest()
                         .body(Map.of("error", "Current password and new password are required"));
             }
 
-            boolean success = userService.changePassword(id, currentPassword, newPassword);
+            if (userService.isOAuthUser(userId)) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Cannot change password for OAuth users"));
+            }
+
+            boolean success = userService.changePassword(userId, request.currentPassword, request.newPassword);
 
             if (success) {
                 return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
             } else {
                 return ResponseEntity.badRequest()
-                        .body(Map.of("error", "Password changed failed"));
+                        .body(Map.of("error", "Current password is incorrect"));
             }
 
         } catch (RuntimeException e) {
@@ -170,5 +183,16 @@ public class UserController {
         public void setCurrency(String currency) { this.currency = currency; }
         public String getTimezone() { return timezone; }
         public void setTimezone(String timezone) { this.timezone = timezone; }
+    }
+
+    public static class ChangePasswordRequest {
+        private String currentPassword;
+        private String newPassword;
+
+        // Getters and setters
+        public String getCurrentPassword() { return currentPassword; }
+        public void setCurrentPassword(String currentPassword) { this.currentPassword = currentPassword; }
+        public String getNewPassword() { return newPassword; }
+        public void setNewPassword(String newPassword) { this.newPassword = newPassword; }
     }
 }
