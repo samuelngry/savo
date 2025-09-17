@@ -2,8 +2,13 @@ package com.savo.backend.controller;
 
 import com.savo.backend.model.User;
 import com.savo.backend.service.impl.UserServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -11,8 +16,9 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 @CrossOrigin(origins = "*")
+@Tag(name = "User Profile", description = "User profile management API")
 public class UserController {
 
     private final UserServiceImpl userService;
@@ -21,129 +27,20 @@ public class UserController {
         this.userService = userService;
     }
 
-    // OAuth Endpoints
-
-    @PostMapping("/oauth/google")
-    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> request) {
+    @GetMapping("/profile")
+    @Operation(
+            summary = "Get user profile",
+            description = "Get the authenticated user's profile information",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Profile retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
+    public ResponseEntity<?> getUserProfile(@AuthenticationPrincipal UserDetails userDetails) {
         try {
-            String email = request.get("email");
-            String firstName = request.get("firstName");
-            String lastName = request.get("lastName");
-            String googleId = request.get("googleId");
-
-            if (email == null || firstName == null || lastName == null) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("error", "Email, firstName, and googleId are required"));
-            }
-
-            User user = userService.handleGoogleLogin(email, firstName, lastName, googleId);
-
-            Map<String, Object> response = new HashMap<>();
-                response.put("id", user.getId());
-                response.put("email", user.getEmail());
-                response.put("firstName", user.getFirstName());
-                response.put("lastName", user.getLastName() != null ? user.getLastName() : "");
-                response.put("fullName", userService.getUserFullName(user));
-                response.put("provider", user.getProvider());
-                response.put("emailVerified", user.getEmailVerified());
-                response.put("currency", user.getCurrency());
-                response.put("timezone", user.getTimezone());
-                response.put("message", "Google login successful");
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Google login failed: " + e.getMessage()));
-        }
-    }
-
-    // Traditional Auth Endpoints
-
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody Map<String, String> request) {
-        try {
-            String email = request.get("email");
-            String username = request.get("username"); // optional
-            String password = request.get("password");
-            String firstName = request.get("firstName");
-            String lastName = request.get("lastName");
-
-            if (email == null || password == null || firstName == null) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("error", "Email, password, and firstName are required"));
-            }
-
-            if (userService.isEmailTaken(email)) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("error", "Email already exists"));
-            }
-
-            User user = userService.createLocalUser(email, username, password, firstName, lastName);
-
-            Map<String, Object> response = Map.of(
-                    "id", user.getId(),
-                    "email", user.getEmail(),
-                    "username", user.getUsername() != null ? user.getUsername() : "",
-                    "firstName", user.getFirstName(),
-                    "lastName", user.getLastName(),
-                    "emailVerified", user.getEmailVerified(),
-                    "message", "User registered successfully. Please verify your email."
-            );
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        try {
-            String emailOrUsername = request.get("emailOrUsername");
-            String password = request.get("password");
-
-            if (emailOrUsername == null || password == null) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("error", "Email/username and password are required"));
-            }
-
-            Optional<User> userOptional = userService.authenticateLocalUser(emailOrUsername, password);
-
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
-
-                Map<String, Object> response = new HashMap<>();
-                response.put("id", user.getId());
-                response.put("email", user.getEmail());
-                response.put("firstName", user.getFirstName());
-                response.put("lastName", user.getLastName() != null ? user.getLastName() : "");
-                response.put("fullName", userService.getUserFullName(user));
-                response.put("username", user.getUsername() != null ? user.getUsername() : "");
-                response.put("provider", user.getProvider());
-                response.put("emailVerified", user.getEmailVerified());
-                response.put("currency", user.getCurrency());
-                response.put("timezone", user.getTimezone());
-                response.put("message", "Login successful");
-
-                return ResponseEntity.ok(response);
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "Invalid username or password"));
-            }
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Login failed: " + e.getMessage()));
-        }
-    }
-
-    // User Profile Endpoints
-
-    @GetMapping("/{id}/profile")
-    public ResponseEntity<?> getUserProfile(@PathVariable String id) {
-        try {
-            Optional<User> userOptional = userService.findById(id);
+            String userId = userDetails.getUsername();
+            Optional<User> userOptional = userService.findById(userId);
 
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
