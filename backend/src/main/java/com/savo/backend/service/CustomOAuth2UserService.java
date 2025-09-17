@@ -65,4 +65,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         return userRepository.save(user);
     }
+
+    private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {
+        existingUser.setFirstName(oAuth2UserInfo.getFirstName());
+        existingUser.setLastName(oAuth2UserInfo.getLastName());
+        existingUser.setUpdatedAt(LocalDateTime.now());
+
+        return userRepository.save(existingUser);
+    }
 }
