@@ -1,5 +1,7 @@
 package com.savo.backend.config;
 
+import com.savo.backend.security.JwtAuthenticationEntryPoint;
+import com.savo.backend.security.JwtAuthenticationFilter;
 import com.savo.backend.security.OAuth2AuthenticationFailureHandler;
 import com.savo.backend.security.OAuth2AuthenticationSuccessHandler;
 import com.savo.backend.service.CustomOAuth2UserService;
