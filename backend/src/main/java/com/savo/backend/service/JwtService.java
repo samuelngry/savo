@@ -1,5 +1,6 @@
 package com.savo.backend.service;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,5 +33,15 @@ public class JwtService {
                 .setExpiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
+    }
+
+    public getUserIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getSubject();
     }
 }
