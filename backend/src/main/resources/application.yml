@@ -30,6 +30,15 @@ spring:
       url-expiration-minutes: 60
       folder-structure: "statements/{userId}/{year}/{month}/{day}"
 
+  springdoc:
+    api-docs:
+      path: /v3/api-docs
+    swagger-ui:
+      path: /swagger-ui.html
+      operationsSorter: method
+      tagsSorter: alpha
+    show-actuator: true
+
 logging:
   level:
     software.amazon.awssdk: DEBUG
