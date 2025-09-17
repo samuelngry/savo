@@ -119,8 +119,8 @@ public class AuthController {
             summary = "Get current user",
             description = "Get the authenticated user's information",
             responses = {
-                    @ApiResponse(responseCode = "200", "User retrieved successfully")
-                    @ApiResponse(responseCode = "401", "Unauthorized")
+                    @ApiResponse(responseCode = "200", description = "User retrieved successfully")
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
             }
     )
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
@@ -154,5 +154,38 @@ public class AuthController {
         response.put("currency", user.getCurrency());
         response.put("timezone", user.getTimezone());
         return response;
+    }
+
+    @PostMapping("/refresh")
+    @Operation(
+            summary = "Refresh JWT token",
+            description = "Refresh the JWT token for authenticated user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Token refreshed successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    public ResponseEntity<?> refreshToken(@AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            String userId = userDetails.getUsername();
+            Optional<User> userOptional = userService.findById(userId);
+
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                String newToken = jwtService.generateToken(user.getId(), user.getEmail());
+
+                return ResponseEntity.ok(Map.of(
+                        "token", newToken,
+                        "user", createUserResponse(user),
+                        "message", "Token refreshed successfully"
+                ));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to refresh token"));
+        }
     }
 }
