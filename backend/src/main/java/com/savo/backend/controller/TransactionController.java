@@ -4,10 +4,14 @@ import com.savo.backend.dto.transaction.TransactionCreateDTO;
 import com.savo.backend.dto.transaction.TransactionResponseDTO;
 import com.savo.backend.dto.transaction.TransactionUpdateDTO;
 import com.savo.backend.service.impl.TransactionServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,9 +29,21 @@ public class TransactionController {
     }
 
     @PostMapping
+    @Operation(
+            summary = "Create user transaction",
+            description = "Create the authenticated user's transaction",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Created transaction successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<TransactionResponseDTO> createTransaction(
-            @PathVariable String userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody TransactionCreateDTO dto) {
+
+        String userId = userDetails.getUsername();
 
         TransactionResponseDTO createdTransaction = transactionService.createTransaction(userId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTransaction);
