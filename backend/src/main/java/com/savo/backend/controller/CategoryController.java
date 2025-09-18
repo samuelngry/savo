@@ -171,9 +171,21 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{categoryId}")
+    @Operation(
+            summary = "Delete category",
+            description = "Delete specific category for authenticated user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Category deleted successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<CategoryResponseDTO> deleteCategory(
-            @PathVariable String userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String categoryId) {
+
+        String userId = userDetails.getUsername();
+
         categoryService.deleteCategory(userId, categoryId);
         return ResponseEntity.noContent().build();
     }
