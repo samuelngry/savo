@@ -4,6 +4,7 @@ import com.savo.backend.dto.category.CategoryCreateDTO;
 import com.savo.backend.dto.category.CategoryResponseDTO;
 import com.savo.backend.dto.category.CategoryUpdateDTO;
 import com.savo.backend.service.CategoryService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users/{userId}/categories")
+@RequestMapping("/api/v1/users/categories")
 @CrossOrigin(origins = "*")
+@Tag(name = "Categories", description = "User categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
