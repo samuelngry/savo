@@ -110,16 +110,31 @@ public class CategoryController {
     }
 
     @GetMapping("/expense")
+    @Operation(
+            summary = "Get all expense categories",
+            description = "Get all expense categories for the authenticated user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Expense categories retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<List<CategoryResponseDTO>> getAllExpenseCategories(
-            @PathVariable String userId) {
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String userId = userDetails.getUsername();
+
         List<CategoryResponseDTO> expenses = categoryService.getExpenseCategoriesForUser(userId);
         return ResponseEntity.ok(expenses);
     }
 
     @GetMapping("/{categoryId}")
     public ResponseEntity<CategoryResponseDTO> getCategory(
-            @PathVariable String userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String categoryId) {
+
+        String userId = userDetails.getUsername();
+
         CategoryResponseDTO category = categoryService.getCategory(userId, categoryId);
         return ResponseEntity.ok(category);
     }
