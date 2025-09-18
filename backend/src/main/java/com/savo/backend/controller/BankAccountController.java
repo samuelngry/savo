@@ -4,10 +4,14 @@ import com.savo.backend.dto.bankaccount.BankAccountCreateDTO;
 import com.savo.backend.dto.bankaccount.BankAccountResponseDTO;
 import com.savo.backend.dto.bankaccount.BankAccountUpdateDTO;
 import com.savo.backend.service.BankAccountService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,9 +29,20 @@ public class BankAccountController {
     }
 
     @PostMapping
+    @Operation(
+            summary = "Create bank account",
+            description = "Create the authenticated user's bank account",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Created bank account successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<BankAccountResponseDTO> createBankAccount(
-            @PathVariable String userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody BankAccountCreateDTO createDTO) {
+
+        String userId = userDetails.getUsername();
 
         BankAccountResponseDTO created =  bankAccountService.createBankAccount(userId, createDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
