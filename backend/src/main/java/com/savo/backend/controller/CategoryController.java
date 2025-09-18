@@ -149,10 +149,23 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}")
+    @Operation(
+            summary = "Update category",
+            description = "Update specific category for authenticated user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Category updated successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<CategoryResponseDTO> updateCategory(
-            @PathVariable String userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String categoryId,
             @Valid @RequestBody CategoryUpdateDTO dto) {
+
+        String userId = userDetails.getUsername();
+
         CategoryResponseDTO updatedCategory = categoryService.updateCategory(userId, categoryId, dto);
         return ResponseEntity.ok(updatedCategory);
     }
