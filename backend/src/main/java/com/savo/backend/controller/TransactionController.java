@@ -110,9 +110,20 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{transactionId}")
+    @Operation(
+            summary = "Delete user transaction",
+            description = "Delete the authenticated user's specific transaction",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Transaction deleted successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<TransactionResponseDTO> deleteTransaction(
-            @PathVariable String userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String transactionId) {
+
+        String userId = userDetails.getUsername();
 
         transactionService.deleteTransaction(userId, transactionId);
         return ResponseEntity.noContent().build();
