@@ -88,10 +88,21 @@ public class BankAccountController {
     }
 
     @PutMapping("/{accountId}")
+    @Operation(
+            summary = "Update user bank account",
+            description = "Update specific authenticated user's bank account",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Bank account updated successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<BankAccountResponseDTO> updateBankAccount(
-            @PathVariable String userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String accountId,
             @Valid @RequestBody BankAccountUpdateDTO updateDTO) {
+
+        String userId = userDetails.getUsername();
 
         BankAccountResponseDTO updated = bankAccountService.updateBankAccount(userId, accountId, updateDTO);
         return ResponseEntity.ok(updated);
