@@ -50,8 +50,19 @@ public class TransactionController {
     }
 
     @GetMapping
+    @Operation(
+            summary = "Get user transactions",
+            description = "Get the authenticated user's transactions",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Transactions retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<List<TransactionResponseDTO>> getTransactions(
-            @PathVariable String userId) {
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String userId = userDetails.getUsername();
 
         List<TransactionResponseDTO> transactions = transactionService.getUserTransactions(userId);
         return ResponseEntity.ok(transactions);
