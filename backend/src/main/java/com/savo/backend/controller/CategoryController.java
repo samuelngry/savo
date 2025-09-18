@@ -91,8 +91,20 @@ public class CategoryController {
     }
 
     @GetMapping("/income")
+    @Operation(
+            summary = "Get all income categories",
+            description = "Get all income categories for the authenticated user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Income categories retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<List<CategoryResponseDTO>> getAllIncomeCategories(
-            @PathVariable String userId) {
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String userId = userDetails.getUsername();
+
         List<CategoryResponseDTO> incomes = categoryService.getIncomeCategoriesForUser(userId);
         return ResponseEntity.ok(incomes);
     }
