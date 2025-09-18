@@ -72,8 +72,20 @@ public class CategoryController {
     }
 
     @GetMapping("/parents")
+    @Operation(
+            summary = "Get all parent categories",
+            description = "Get all parent categories for the authenticated user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Parent categories retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<List<CategoryResponseDTO>> getAllParentCategories(
-            @PathVariable String userId) {
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String userId = userDetails.getUsername();
+
         List<CategoryResponseDTO> parents = categoryService.getParentCategoriesForUser(userId);
         return ResponseEntity.ok(parents);
     }
