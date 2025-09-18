@@ -4,6 +4,7 @@ import com.savo.backend.dto.transaction.TransactionCreateDTO;
 import com.savo.backend.dto.transaction.TransactionResponseDTO;
 import com.savo.backend.dto.transaction.TransactionUpdateDTO;
 import com.savo.backend.service.impl.TransactionServiceImpl;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users/{userId}/transactions")
+@RequestMapping("/api/v1/users/transactions")
 @CrossOrigin(origins = "*")
+@Tag(name = "Transactions", description = "User transactions API")
 public class TransactionController {
 
     private final TransactionServiceImpl transactionService;
