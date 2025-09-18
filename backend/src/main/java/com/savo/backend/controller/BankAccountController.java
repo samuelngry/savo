@@ -4,6 +4,7 @@ import com.savo.backend.dto.bankaccount.BankAccountCreateDTO;
 import com.savo.backend.dto.bankaccount.BankAccountResponseDTO;
 import com.savo.backend.dto.bankaccount.BankAccountUpdateDTO;
 import com.savo.backend.service.BankAccountService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users/{userId}/bank-accounts")
+@RequestMapping("/api/v1/users/bank-accounts")
 @CrossOrigin(origins = "*")
+@Tag(name = "Bank Account", description = "Manage user's bank accounts")
 public class BankAccountController {
 
     private final BankAccountService bankAccountService;
