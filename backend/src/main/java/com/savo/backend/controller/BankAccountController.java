@@ -109,9 +109,20 @@ public class BankAccountController {
     }
 
     @DeleteMapping("/{accountId}")
+    @Operation(
+            summary = "Delete user bank account",
+            description = "Delete specific authenticated user's bank accoount",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Bank account deleted successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<BankAccountResponseDTO> deleteBankAccount(
-            @PathVariable String userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String accountId) {
+
+        String userId = userDetails.getUsername();
 
         BankAccountResponseDTO deactivatedAccount = bankAccountService.deactivateBankAccount(userId, accountId);
         return ResponseEntity.ok(deactivatedAccount);
