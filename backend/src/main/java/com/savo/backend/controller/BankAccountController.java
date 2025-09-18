@@ -68,9 +68,20 @@ public class BankAccountController {
     }
 
     @GetMapping("/{accountId}")
+    @Operation(
+            summary = "Get user bank account",
+            description = "Get specific authenticated user's bank account",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Bank account retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<BankAccountResponseDTO> getBankAccount(
-            @PathVariable String userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String accountId) {
+
+        String userId = userDetails.getUsername();
 
         BankAccountResponseDTO bankAccount =  bankAccountService.getBankAccount(userId, accountId);
         return ResponseEntity.ok(bankAccount);
