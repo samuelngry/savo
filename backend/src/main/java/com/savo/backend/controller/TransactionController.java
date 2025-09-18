@@ -89,10 +89,21 @@ public class TransactionController {
     }
 
     @PutMapping("/{transactionId}")
+    @Operation(
+            summary = "Update user transaction",
+            description = "Update the authenticated user's specific transaction",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Transaction updated successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<TransactionResponseDTO> updateTransaction(
-            @PathVariable String userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String transactionId,
             @Valid @RequestBody TransactionUpdateDTO dto) {
+
+        String userId = userDetails.getUsername();
 
         TransactionResponseDTO updatedTransaction = transactionService.updateTransaction(userId, transactionId, dto);
         return ResponseEntity.ok(updatedTransaction);
