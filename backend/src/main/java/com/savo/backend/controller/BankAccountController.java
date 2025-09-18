@@ -111,7 +111,7 @@ public class BankAccountController {
     @DeleteMapping("/{accountId}")
     @Operation(
             summary = "Delete user bank account",
-            description = "Delete specific authenticated user's bank accoount",
+            description = "Delete specific authenticated user's bank account",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Bank account deleted successfully"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized"),
@@ -129,9 +129,20 @@ public class BankAccountController {
     }
 
     @PutMapping("/{accountId}/activate")
+    @Operation(
+            summary = "Activate user bank account",
+            description = "Active authenticated user's bank account",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Bank account activated successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<BankAccountResponseDTO> activateBankAccount(
-            @PathVariable String userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String accountId) {
+
+        String userId = userDetails.getUsername();
 
         BankAccountResponseDTO activatedAccount = bankAccountService.activateBankAccount(userId, accountId);
         return ResponseEntity.ok(activatedAccount);
