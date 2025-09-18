@@ -129,6 +129,15 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
+    @Operation(
+            summary = "Get category",
+            description = "Get specific category for authenticated user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Category retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<CategoryResponseDTO> getCategory(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String categoryId) {
