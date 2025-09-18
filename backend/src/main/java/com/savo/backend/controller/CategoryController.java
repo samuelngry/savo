@@ -4,10 +4,14 @@ import com.savo.backend.dto.category.CategoryCreateDTO;
 import com.savo.backend.dto.category.CategoryResponseDTO;
 import com.savo.backend.dto.category.CategoryUpdateDTO;
 import com.savo.backend.service.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,9 +32,22 @@ public class CategoryController {
     }
 
     @PostMapping
+    @Operation(
+            summary = "Create category",
+            description = "Create a new category for the authenticated user",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Category created successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+                    @ApiResponse(responseCode = "404", description = "User not found")
+            }
+    )
     public ResponseEntity<CategoryResponseDTO> createCategory(
-            @PathVariable String userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody CategoryCreateDTO dto) {
+
+        String userId = userDetails.getUsername();
+
         CategoryResponseDTO createdCategory = categoryService.createCategory(userId, dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }

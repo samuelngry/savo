@@ -33,7 +33,8 @@ public class BankAccountController {
             summary = "Create bank account",
             description = "Create the authenticated user's bank account",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Created bank account successfully"),
+                    @ApiResponse(responseCode = "201", description = "Created bank account successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized"),
                     @ApiResponse(responseCode = "404", description = "User not found")
             }
@@ -93,6 +94,7 @@ public class BankAccountController {
             description = "Update specific authenticated user's bank account",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Bank account updated successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized"),
                     @ApiResponse(responseCode = "404", description = "User not found")
             }
