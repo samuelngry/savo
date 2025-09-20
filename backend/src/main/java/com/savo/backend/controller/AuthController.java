@@ -119,7 +119,7 @@ public class AuthController {
             summary = "Get current user",
             description = "Get the authenticated user's information",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "User retrieved successfully")
+                    @ApiResponse(responseCode = "200", description = "User retrieved successfully"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized")
             }
     )
