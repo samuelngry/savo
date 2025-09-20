@@ -198,4 +198,23 @@ public class StatementUploadController {
             throw e;
         }
     }
+
+    private void validateUploadRequest(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new ValidationException("File is required and cannot be empty");
+        }
+
+        if (!"application/pdf".equals(file.getContentType())) {
+            throw new ValidationException("Only PDF files are supported");
+        }
+
+        if (file.getOriginalFilename() == null || file.getOriginalFilename().trim().isEmpty()) {
+            throw new ValidationException("File must have a valid filename");
+        }
+
+        long maxSize = 50 * 1024 * 1024; // 50MB
+        if (file.getSize() > maxSize) {
+            throw new ValidationException("File size cannot exceed 50MB");
+        }
+    }
 }
