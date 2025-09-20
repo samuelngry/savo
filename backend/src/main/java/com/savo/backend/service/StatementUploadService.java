@@ -230,6 +230,35 @@ public class StatementUploadService {
         }
     }
 
+    public StatementUploadResponseDTO retryUpload(String uploadId, String userId) {
+        StatementUpload upload = statementUploadRepository.findByIdAndUserId(uploadId, userId)
+                .orElseThrow(() -> new ValidationException("Upload not found"));
+
+        // Only allow retry for failed uploads
+        if (upload.getUploadStatus() != UploadStatus.FAILED) {
+            throw new ValidationException("Only failed uploads can be retried");
+        }
+
+        // Check if file still exists in S3
+        if (!fileStorageService.fileExists(upload.getS3Key())) {
+            throw new ValidationException("Original file no longer exists and cannot be retried");
+        }
+
+        // Reset upload status and timestamps
+        upload.setUploadStatus(UploadStatus.PROCESSING);
+        upload.setProcessingStartedAt(LocalDateTime.now());
+        upload.setProcessingCompletedAt(null);
+        upload.setErrorMessage(null);
+        upload.setTotalTransactionsExtracted(null);
+
+        StatementUpload savedUpload = statementUploadRepository.save(upload);
+
+        // Start background processing
+        processStatementAsync(savedUpload.getId());
+
+        return StatementUploadResponseDTO.from(savedUpload);
+    }
+
     private List<TransactionSample> extractSampleTransactions(MultipartFile file, String bankAccountName, int sampleSize) throws IOException {
         String pdfText = extractPDFText(file, -1); // Read full document
         List<TransactionSample> samples = new ArrayList<>();

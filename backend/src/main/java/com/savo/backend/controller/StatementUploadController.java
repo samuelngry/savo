@@ -164,4 +164,38 @@ public class StatementUploadController {
             throw e;
         }
     }
+
+    @PostMapping("/{uploadId}/retry")
+    @Operation(
+            summary = "Retry failed upload",
+            description = "Retry processing a failed statement upload",
+            responses = {
+                    @ApiResponse(responseCode = "202", description = "Retry initiated successfully"),
+                    @ApiResponse(responseCode = "404", description = "Upload not found"),
+                    @ApiResponse(responseCode = "400", description = "Upload cannot be retried"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    public ResponseEntity<StatementUploadResponseDTO> retryUpload(
+            @Parameter(description = "Upload ID", required = true)
+            @PathVariable String uploadId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        try {
+            String userId = userDetails.getUsername();
+
+            StatementUploadResponseDTO response = statementUploadService.retryUpload(
+                    uploadId,
+                    userId
+            );
+
+            logger.info("Upload retry successfully: uploadId={}", uploadId);
+
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+
+        } catch (ValidationException e) {
+            logger.warn("Upload validation failed: uploadId={}, error={}", uploadId, e.getMessage());
+            throw e;
+        }
+    }
 }
