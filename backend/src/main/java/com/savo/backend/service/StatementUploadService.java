@@ -171,30 +171,28 @@ public class StatementUploadService {
     public Page<UploadHistoryResponseDTO> getUploadHistory(String userId, Pageable pageable,
                                                            String bankName, String status) {
 
-        Specification<StatementUpload> spec = Specification.where(null);
-
-        spec = spec.and((root, query, builder) ->
-                builder.equal(root.get("user").get("id"), userId));
+        Specification<StatementUpload> spec = (root, query, builder) ->
+                builder.equal(root.get("user").get("id"), userId);
 
         // Filter by bank name if provided
         if (bankName != null && !bankName.trim().isEmpty()) {
-            spec = spec.and((root, query, builder) ->
-                    builder.equal(root.get("bankAccount").get("bankName"), bankName.toUpperCase()));
+            Specification<StatementUpload> bankSpec = (root, query, builder) ->
+                    builder.equal(root.get("bankAccount").get("bankName"), bankName.toUpperCase());
+            spec = spec.and(bankSpec);
         }
 
         // Filter by status if provided
         if (status != null && !status.trim().isEmpty()) {
             try {
                 UploadStatus uploadStatus = UploadStatus.valueOf(status.toUpperCase());
-                spec = spec.and((root, query, builder) ->
-                        builder.equal(root.get("uploadStatus"), uploadStatus));
+                Specification<StatementUpload> statusSpec = (root, query, builder) ->
+                        builder.equal(root.get("uploadStatus"), uploadStatus);
+                spec = spec.and(statusSpec);
             } catch (IllegalArgumentException e) {
-                // Invalid status, ignore filter
                 logger.warn("Invalid status filter: {}", status);
             }
         }
 
-        // Order by creation date descending
         Page<StatementUpload> uploads = statementUploadRepository.findAll(spec, pageable);
 
         return uploads.map(UploadHistoryResponseDTO::from);
