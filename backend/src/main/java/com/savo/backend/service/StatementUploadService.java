@@ -16,6 +16,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -165,6 +167,38 @@ public class StatementUploadService {
                 .orElseThrow(() -> new ValidationException("Upload not found"));
 
         return UploadStatusResponseDTO.from(upload);
+    }
+
+    public Page<UploadHistoryResponseDTO> getUploadHistory(String userId, Pageable pageable,
+                                                           String bankName, String status) {
+
+        Specification<StatementUpload> spec = Specification.where(null);
+
+        spec = spec.and((root, query, builder) ->
+                builder.equal(root.get("user").get("id"), userId));
+
+        // Filter by bank name if provided
+        if (bankName != null && !bankName.trim().isEmpty()) {
+            spec = spec.and((root, query, builder) ->
+                    builder.equal(root.get("bankAccount").get("bankName"), bankName.toUpperCase()));
+        }
+
+        // Filter by status if provided
+        if (status != null && !status.trim().isEmpty()) {
+            try {
+                UploadStatus uploadStatus = UploadStatus.valueOf(status.toUpperCase());
+                spec = spec.and((root, query, builder) ->
+                        builder.equal(root.get("uploadStatus"), uploadStatus));
+            } catch (IllegalArgumentException e) {
+                // Invalid status, ignore filter
+                logger.warn("Invalid status filter: {}", status);
+            }
+        }
+
+        // Order by creation date descending
+        Page<StatementUpload> uploads = statementUploadRepository.findAll(spec, pageable);
+
+        return uploads.map(UploadHistoryResponseDTO::from);
     }
 
     private List<TransactionSample> extractSampleTransactions(MultipartFile file, String bankAccountName, int sampleSize) throws IOException {
