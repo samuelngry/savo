@@ -2,7 +2,7 @@
 node_modules/
 */node_modules/
 
-application.yml
+/backend/src/main/resources/application.yml
 application-*.yml
 
 # Environment files
