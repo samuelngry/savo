@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/users/statements")
+@RequestMapping("/api/v1/users/statements")
 @CrossOrigin(origins = "*")
 public class StatementUploadController {
 
@@ -68,4 +68,32 @@ public class StatementUploadController {
         }
     }
 
+    @GetMapping("/{uploadId}/status")
+    @Operation(
+            summary = "Get upload status",
+            description = "Get the current status of a statement upload and processing",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Status retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "Upload not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    public ResponseEntity<UploadStatusResponseDTO> getUploadStatus(
+            @Parameter(description = "Upload ID", required = true)
+            @PathVariable String uploadId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        try {
+            String userId = userDetails.getUsername();
+            logger.info("Get upload status request received: uploadId={}", uploadId);
+
+            UploadStatusResponseDTO status = statementUploadService.getUploadStatus(uploadId, userId);
+
+            return ResponseEntity.ok(status);
+
+        } catch (ValidationException e) {
+            logger.warn("Upload status request failed: uploadId={}, error={}", uploadId, e.getMessage());
+            throw e;
+        }
+    }
 }

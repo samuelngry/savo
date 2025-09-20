@@ -160,6 +160,13 @@ public class StatementUploadService {
         return null;
     }
 
+    public UploadStatusResponseDTO getUploadStatus(String uploadId, String userId) {
+        StatementUpload upload = statementUploadRepository.findByIdAndUserId(uploadId, userId)
+                .orElseThrow(() -> new ValidationException("Upload not found"));
+
+        return UploadStatusResponseDTO.from(upload);
+    }
+
     private List<TransactionSample> extractSampleTransactions(MultipartFile file, String bankAccountName, int sampleSize) throws IOException {
         String pdfText = extractPDFText(file, -1); // Read full document
         List<TransactionSample> samples = new ArrayList<>();
