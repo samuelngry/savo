@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.awt.print.Pageable;
 
 @RestController
 @RequestMapping("/api/v1/users/statements")
@@ -94,6 +97,41 @@ public class StatementUploadController {
         } catch (ValidationException e) {
             logger.warn("Upload status request failed: uploadId={}, error={}", uploadId, e.getMessage());
             throw e;
+        }
+    }
+
+    @GetMapping("/history")
+    @Operation(
+            summary = "Get upload history",
+            description = "Get paginated list of user's statement uploads with their status",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Upload history retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    public ResponseEntity<Page<UploadHistoryResponseDTO>> getUploadHistory(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PageableDefault(size = 20) Pageable pageable,
+            @Parameter(description = "Filter by bank name")
+            @RequestParam(required = false) String bankName,
+            @Parameter(description = "Filter by upload status")
+            @RequestParam(required = false) String status) {
+
+        try {
+            String userId = userDetails.getUsername();
+
+            Page<UploadHistoryResponseDTO> history = statementUploadService.getUploadHistory(
+                    userId,
+                    pageable,
+                    bankName,
+                    status
+            );
+
+            return ResponseEntity.ok(history);
+
+        } catch (Exception e) {
+            logger.error("Failed to retrieve upload history for user: {}", userDetails.getUsername(), e);
+            throw new RuntimeException("Failed to retrieve upload history", e);
         }
     }
 }
