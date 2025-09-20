@@ -44,6 +44,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
     long countByUserId(String userId);
 
+    void deleteByStatementUploadId(String statementUploadId);
+
     @Query("SELECT COUNT(t) FROM Transaction t WHERE t.bankAccount.id = :bankAccountId " +
             "AND t.transactionDate BETWEEN :startDate AND :endDate")
     long countByBankAccountIdAndDateRange(

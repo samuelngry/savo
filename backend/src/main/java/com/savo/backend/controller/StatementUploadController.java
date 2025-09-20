@@ -134,4 +134,34 @@ public class StatementUploadController {
             throw new RuntimeException("Failed to retrieve upload history", e);
         }
     }
+
+    @DeleteMapping("/{uploadId}")
+    @Operation(
+            summary = "Cancel/Delete upload",
+            description = "Cancel a pending upload or delete a completed upload and its transactions",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Upload deleted successfully"),
+                    @ApiResponse(responseCode = "404", description = "Upload not found"),
+                    @ApiResponse(responseCode = "400", description = "Upload cannot be deleted"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+            }
+    )
+    public ResponseEntity<Void> deleteUpload(
+            @Parameter(description = "Upload ID", required = true)
+            @RequestParam String uploadId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        try {
+            String userId = userDetails.getUsername();
+
+            statementUploadService.deleteUpload(uploadId, userId);
+            logger.info("Upload deleted successfully: uploadId={}, user={}", uploadId, userId);
+
+            return ResponseEntity.noContent().build();
+
+        } catch (ValidationException e) {
+            logger.warn("Upload validation failed: uploadId={}, error={}", uploadId, e.getMessage());
+            throw e;
+        }
+    }
 }

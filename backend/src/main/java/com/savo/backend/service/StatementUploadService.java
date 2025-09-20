@@ -201,6 +201,35 @@ public class StatementUploadService {
         return uploads.map(UploadHistoryResponseDTO::from);
     }
 
+    public void deleteUpload(String uploadId, String userId) {
+        StatementUpload upload = statementUploadRepository.findByIdAndUserId(uploadId, userId)
+                .orElseThrow(() -> new ValidationException("Upload not found"));
+
+        // Only allow deletion if not currently processing
+        if (upload.getUploadStatus() == UploadStatus.PROCESSING) {
+            throw new ValidationException("Cannot delete upload while it's being processed");
+        }
+
+        try {
+            // Delete associated transactions first
+            if (upload.getUploadStatus() == UploadStatus.COMPLETED) {
+                transactionRepository.deleteByStatementUploadId(uploadId);
+                logger.info("Deleted transactions for upload: {}", uploadId);
+            }
+
+            // Delete file from S3
+            fileStorageService.deleteFile(upload.getS3Key());
+
+            statementUploadRepository.delete(upload);
+
+            logger.info("Successfully deleted upload: {}", uploadId);
+
+        } catch (Exception e) {
+            logger.error("Failed to delete upload: {}", uploadId, e);
+            throw new RuntimeException("Failed to delete upload", e);
+        }
+    }
+
     private List<TransactionSample> extractSampleTransactions(MultipartFile file, String bankAccountName, int sampleSize) throws IOException {
         String pdfText = extractPDFText(file, -1); // Read full document
         List<TransactionSample> samples = new ArrayList<>();
