@@ -3,6 +3,7 @@ package com.savo.backend.service;
 import com.savo.backend.dto.statementupload.StatementUploadRequestDTO;
 import com.savo.backend.dto.statementupload.StatementUploadResponseDTO;
 import com.savo.backend.dto.statementupload.TransactionSample;
+import com.savo.backend.dto.statementupload.UploadStatusResponseDTO;
 import com.savo.backend.enums.UploadStatus;
 import com.savo.backend.exception.ValidationException;
 import com.savo.backend.model.BankAccount;

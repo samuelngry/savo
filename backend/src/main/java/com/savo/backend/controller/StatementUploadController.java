@@ -1,6 +1,7 @@
 package com.savo.backend.controller;
 
 import com.savo.backend.dto.statementupload.StatementUploadResponseDTO;
+import com.savo.backend.dto.statementupload.UploadStatusResponseDTO;
 import com.savo.backend.exception.ValidationException;
 import com.savo.backend.service.StatementUploadService;
 import io.swagger.v3.oas.annotations.Operation;
