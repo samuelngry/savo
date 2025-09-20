@@ -46,8 +46,11 @@ public class StatementUploadService {
     private final TransactionRepository transactionRepository;
     private final BankAccountService bankAccountService;
     private final BankDetectionService bankDetectionService;
+    private final StatementParserService statementParserService;
 
-    public StatementUploadService(StatementUploadRepository statementUploadRepository, UserRepository userRepository, FileStorageService fileStorageService, BankAccountRepository bankAccountRepository, TransactionRepository transactionRepository, BankAccountService bankAccountService, BankDetectionService bankDetectionService) {
+    public StatementUploadService(StatementUploadRepository statementUploadRepository, UserRepository userRepository, FileStorageService fileStorageService,
+                                  BankAccountRepository bankAccountRepository, TransactionRepository transactionRepository, BankAccountService bankAccountService,
+                                  BankDetectionService bankDetectionService, StatementParserService statementParserService) {
         this.statementUploadRepository = statementUploadRepository;
         this.userRepository = userRepository;
         this.fileStorageService = fileStorageService;
@@ -55,6 +58,7 @@ public class StatementUploadService {
         this.transactionRepository = transactionRepository;
         this.bankAccountService = bankAccountService;
         this.bankDetectionService = bankDetectionService;
+        this.statementParserService = statementParserService;
     }
 
     public StatementUploadResponseDTO processStatementUpload(MultipartFile file, String userId) {
@@ -425,8 +429,7 @@ public class StatementUploadService {
 
             logger.info("Starting statement processing for upload: {}", uploadId);
 
-            // TODO: Add actual PDF parsing and transaction extraction here
-            // statementParserService.parseAndSaveTransactions(upload);
+            statementParserService.parseAndSaveTransactions(upload);
 
             upload.setUploadStatus(UploadStatus.COMPLETED);
             upload.setProcessingCompletedAt(LocalDateTime.now());
