@@ -2,6 +2,9 @@
 node_modules/
 */node_modules/
 
+application.yml
+application-*.yml
+
 # Environment files
 .env
 .env.local
