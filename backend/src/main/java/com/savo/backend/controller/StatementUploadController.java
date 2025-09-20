@@ -1,7 +1,6 @@
 package com.savo.backend.controller;
 
-import com.savo.backend.dto.statementupload.StatementUploadResponseDTO;
-import com.savo.backend.dto.statementupload.UploadStatusResponseDTO;
+import com.savo.backend.dto.statementupload.*;
 import com.savo.backend.exception.ValidationException;
 import com.savo.backend.service.StatementUploadService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

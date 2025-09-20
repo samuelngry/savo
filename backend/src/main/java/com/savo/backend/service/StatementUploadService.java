@@ -1,9 +1,6 @@
 package com.savo.backend.service;
 
-import com.savo.backend.dto.statementupload.StatementUploadRequestDTO;
-import com.savo.backend.dto.statementupload.StatementUploadResponseDTO;
-import com.savo.backend.dto.statementupload.TransactionSample;
-import com.savo.backend.dto.statementupload.UploadStatusResponseDTO;
+import com.savo.backend.dto.statementupload.*;
 import com.savo.backend.enums.UploadStatus;
 import com.savo.backend.exception.ValidationException;
 import com.savo.backend.model.BankAccount;
@@ -17,6 +14,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
