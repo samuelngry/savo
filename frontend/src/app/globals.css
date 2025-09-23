@@ -17,3 +17,18 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes marqueeLoop {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marqueeLoop {
+  animation: marqueeLoop 15s linear infinite;
+}
+

@@ -10,7 +10,7 @@ export default function Hero() {
                     <h1 className="text-7xl md:text-6xl font-bold mb-6 mt-2">
                         Upload Statements, Instant Insights
                     </h1>
-                    <p className="text-lg mb-6">
+                    <p className="text-lg mb-6 text-gray-600">
                         Upload your bank statements in seconds. Get instant insights into your spending, and no account linking needed.
                     </p>
                     <button className="bg-slate-950 text-white font-bold px-6 py-3 rounded-lg cursor-pointer">Get Started</button>
