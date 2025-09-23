@@ -28,13 +28,13 @@ export default function HowItWorks() {
     ];
 
     return (
-        <section className="py-20">
+        <section className="py-10">
             <div className="max-w-7xl mx-auto px-6">
 
                 {steps.map((step, index) => (
                     <div
                         key={index}
-                        className={`flex flex-col-reverse md:flex-row ${step.reverse ? "md:flex-row-reverse" : "" } items-center gap-12 mb-24`}
+                        className={`flex flex-col-reverse md:flex-row ${step.reverse ? "md:flex-row-reverse" : "" } items-center gap-20 mb-24`}
                     >
                         <div className="w-full md:w-1/2">
                             <Image
