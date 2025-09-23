@@ -77,9 +77,9 @@ export default function FAQ() {
                 <div className="text-center p-6 bg-stone-200 border rounded-xl shadow-sm h-full flex flex-col justify-between border-stone-200">
                     <div className="flex-grow flex flex-col justify-center">
                         <h4 className="text-lg font-semibold mb-2">
-                            Don't see the answer you need?
+                            Can't find the answer to your question?
                         </h4>
-                        <p className="mb-4">
+                        <p className="mb-6">
                             We are here to help - feel free to reach out and we will get back to you ASAP.
                         </p>
                         <Link href="/contact">
