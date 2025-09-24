@@ -15,7 +15,7 @@ export default function CTA() {
                 <p className="text-lg md:text-xl text-white mb-8 max-w-2xl">
                     Upload your bank statements and get instant insights without linking any accounts.
                 </p>
-                <Link href="/get-started">
+                <Link href="/register">
                     <button className="bg-white text-slate-950 cursor-pointer font-bold px-6 py-3 rounded-lg hover:bg-gray-100 transition">
                         Get Started
                     </button>

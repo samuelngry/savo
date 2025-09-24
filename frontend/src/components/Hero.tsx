@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Hero() {
     return (
@@ -13,7 +14,12 @@ export default function Hero() {
                     <p className="text-lg mb-6 text-gray-600">
                         Upload your bank statements in seconds. Get instant insights into your spending, and no account linking needed.
                     </p>
-                    <button className="bg-slate-950 text-white font-bold px-6 py-3 rounded-lg cursor-pointer">Get Started</button>
+                    <Link
+                        href="/register"
+                        className="bg-slate-950 text-white font-bold px-6 py-3 rounded-lg cursor-pointer"
+                    >
+                        Get Started
+                    </Link>
                 </div>
 
                 {/* Image */}

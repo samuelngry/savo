@@ -28,7 +28,7 @@ export default function NavBar() {
                     <Link href="/login">
                         <button className="text-slate-950 font-medium hover:underline cursor-pointer">Login</button>
                     </Link>
-                    <Link href="/signup">
+                    <Link href="/register">
                         <button className="bg-slate-950 text-white px-4 py-2 rounded-lg font-semibold cursor-pointer">
                             Sign Up
                         </button>
