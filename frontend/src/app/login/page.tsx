@@ -11,17 +11,17 @@ export default function LoginPage() {
                 <div className="mb-8">
                     <Image src="/logo.png" alt="Savo Logo" width={60} height={60} className="mx-auto" />
                     <h1 className="text-2xl font-bold mt-4">Welcome Back!</h1>
-                    <p className="text-sm text-gray-600">Sign in to continue</p>
+                    <p className="text-sm text-gray-600 mt-2">Sign in to continue</p>
                 </div>
 
                 {/* Manual Sign In */}
                 <form className="text-left">
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">Email or Username</label>
+                        <label className="block text-sm font-medium text-gray-700">Email</label>
                             <input
-                                type="text"
-                                className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-                                placeholder="Enter your email or username"
+                                type="email"
+                                className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
+                                placeholder="Enter your email"
                         />
                     </div>
 
@@ -29,7 +29,7 @@ export default function LoginPage() {
                         <label className="block text-sm font-medium text-gray-700">Password</label>
                         <input
                             type="password"
-                            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                            className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-300"
                             placeholder="Enter your password"
                         />
                     </div>
@@ -66,7 +66,7 @@ export default function LoginPage() {
                 {/* Sign Up Link */}
                 <p className="mt-6 text-sm text-gray-500">
                     Don't have an account?{" "}
-                    <Link href="/signup" className="text-slate-950 font-medium hover:underline">
+                    <Link href="/register" className="text-slate-950 font-medium hover:underline">
                         Sign up
                     </Link>
                 </p>
