@@ -15,8 +15,8 @@ export default function Footer() {
                         height={60}
                         className="cursor-pointer mb-4"
                     />
-                    <p className="mb-4">
-                        Privacy-first insights from your statements. No bank linking needed.
+                    <p className="mb-4 text-sm">
+                        Privacy-first insights from your statements.
                     </p>
                     <div className="flex gap-4">
                         <a href="#" className="text-xl" aria-label="Instagram">
@@ -33,29 +33,29 @@ export default function Footer() {
 
                 {/* Quick Links */}
                 <div>
-                <h4 className="text-lg font-bold mb-3">Quick Links</h4>
-                <ul className="space-y-2">
-                    <li><a href="/why" >Why Savo?</a></li>
-                    <li><a href="/features" >Features</a></li>
-                    <li><a href="/pricing" >Pricing</a></li>
-                    <li><a href="/contact" >Contact</a></li>
-                </ul>
+                    <h4 className="font-bold mb-3">Quick Links</h4>
+                    <ul className="space-y-2">
+                        <li><a href="/why" className="text-sm">Why Savo?</a></li>
+                        <li><a href="/features" className="text-sm">Features</a></li>
+                        <li><a href="/pricing" className="text-sm">Pricing</a></li>
+                        <li><a href="/contact" className="text-sm">Contact</a></li>
+                    </ul>
                 </div>
 
                 {/* Legal / Support */}
                 <div>
-                <h4 className="text-lg font-bold mb-3">Help & Legal</h4>
-                <ul className="space-y-2">
-                    <li><a href="/faq">FAQ</a></li>
-                    <li><a href="/support" >Support</a></li>
-                    <li><a href="/privacy">Privacy Policy</a></li>
-                    <li><a href="/terms">Terms of Service</a></li>
-                </ul>
+                    <h4 className="font-bold mb-3">Help & Legal</h4>
+                    <ul className="space-y-2">
+                        <li><a href="/faq" className="text-sm">FAQ</a></li>
+                        <li><a href="/support" className="text-sm">Support</a></li>
+                        <li><a href="/privacy" className="text-sm">Privacy Policy</a></li>
+                        <li><a href="/terms" className="text-sm">Terms of Service</a></li>
+                    </ul>
                 </div>
 
             </div>
 
-            <div className="mt-10 border-t border-slate-600 pt-6 text-center text-sm">
+            <div className="mt-10 border-t border-slate-600 pt-6 text-center text-xs">
                 &copy; {new Date().getFullYear()} Savo. All rights reserved.
             </div>
         </footer>
