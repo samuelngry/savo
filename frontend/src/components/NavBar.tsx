@@ -19,9 +19,9 @@ export default function NavBar() {
                 </div>
 
                 <div className="hidden md:flex gap-8 text-sm font-medium text-slate-950">
-                    <Link href="/why-savo">Why Savo?</Link>
-                    <Link href="/contact">Contact</Link>
-                    <Link href="/pricing">Pricing</Link>
+                    <Link className="hover:underline" href="/why-savo">Why Savo?</Link>
+                    <Link className="hover:underline" href="/contact">Contact</Link>
+                    <Link className="hover:underline" href="/pricing">Pricing</Link>
                 </div>
 
                 <div className="flex gap-8 text-sm items-center">
