@@ -1,5 +1,6 @@
 import { FcGoogle } from "react-icons/fc";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function LoginPage() {
 
@@ -14,8 +15,8 @@ export default function LoginPage() {
                 </div>
 
                 {/* Manual Sign In */}
-                <form className="space-y-4 text-left">
-                    <div>
+                <form className="text-left">
+                    <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">Email or Username</label>
                             <input
                                 type="text"
@@ -24,7 +25,7 @@ export default function LoginPage() {
                         />
                     </div>
 
-                    <div>
+                    <div className="mb-2">
                         <label className="block text-sm font-medium text-gray-700">Password</label>
                         <input
                             type="password"
@@ -33,9 +34,15 @@ export default function LoginPage() {
                         />
                     </div>
 
+                    <div className="text-right mb-6 underline">
+                        <Link href="/reset" className="text-sm">
+                            Forgot password?
+                        </Link>
+                    </div>
+
                     <button
                         type="submit"
-                        className="w-full bg-slate-950 text-white py-2 rounded-lg font-semibold hover:bg-slate-800 transition"
+                        className="w-full bg-slate-950 text-white cursor-pointer py-2 rounded-lg font-semibold hover:bg-slate-800 transition"
                     >
                         Sign In
                     </button>
@@ -50,7 +57,7 @@ export default function LoginPage() {
 
                 {/* Google Sign In */}
                 <button
-                    className="flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-lg w-full font-medium hover:shadow-md transition"
+                    className="flex items-center justify-center gap-3 bg-white border cursor-pointer border-gray-300 text-gray-700 px-6 py-2 rounded-lg w-full font-medium hover:shadow-md transition"
                 >
                     <FcGoogle className="text-xl" />
                     Sign in with Google
@@ -59,9 +66,9 @@ export default function LoginPage() {
                 {/* Sign Up Link */}
                 <p className="mt-6 text-sm text-gray-500">
                     Don't have an account?{" "}
-                    <a href="/signup" className="text-slate-950 font-medium hover:underline">
+                    <Link href="/signup" className="text-slate-950 font-medium hover:underline">
                         Sign up
-                    </a>
+                    </Link>
                 </p>
 
                 {/* Disclaimer */}
